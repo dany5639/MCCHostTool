@@ -7,8 +7,9 @@ namespace MCCHostTool
     public partial class Form1 : Form
     {
         private static string logFile = $"{Directory.GetParent(Environment.ProcessPath)}\\MCCHostTool_settings.csv";
-        private Dictionary<string, item> items;
-        public List<string> gameVariantOverrides = new List<string>();
+        private Dictionary<string, item> mapVariantsCollection;
+        private Dictionary<string, item> gameVariantsCollection;
+        public List<string> gameVariantOverrides_list = new List<string>();
 
         #region utilities
         private static void clog(string in_)
@@ -22,7 +23,6 @@ namespace MCCHostTool
         }
         private static List<string> ReadCsv(string filename, int lineCount = -1)
         {
-            clog("WriteCsv");
             var output = new List<string>();
 
             using (var reader = new StreamReader(filename))
@@ -50,8 +50,6 @@ namespace MCCHostTool
         }
         private static void WriteCsv(List<string> in_, string file)
         {
-            clog("WriteCsv");
-
             var fileOut = new FileInfo(file);
             if (File.Exists(file))
                 File.Delete(file);
@@ -76,20 +74,33 @@ namespace MCCHostTool
             { }
         }
         #endregion
-   
+
         #region classes
         private class item
         {
-            public string name;
-            public string map_variant;
-            public string map_variant_description;
-            public string game_variant;
-            public string game_variant_description;
-            public string enabled;
-            public string playerCount;
-            public string comment;
-            public string quality;
+            public string name__________;
+            public string map_variant___;
+            public string map_variant_de;
+            public string game_variant__;
+            public string game_variant_d;
+            public string enabled_______;
+            public string playerCount___;
+            public string comment_______;
+            public string quality_______;
             // public string description; // obsolete
+        }
+
+        private enum cell
+        {
+            name__________,
+            map_variant___,
+            map_variant_de,
+            game_variant__,
+            game_variant_d,
+            enabled_______,
+            playerCount___,
+            comment_______,
+            quality_______,
         }
 
         public List<string> MCCtitles = new List<string> {
@@ -107,27 +118,28 @@ namespace MCCHostTool
         {
             InitializeComponent();
 
+            // TODO handle cases where not all titles are installed
             foreach (var a in MCCtitles)
                 comboBox2.Items.Add(a);
 
             comboBox2.SelectedIndex = comboBox2.Items.Count - 1;
 
             toolStripStatusLabel1.Text = "";
-        }
-        private void readItemsList()
-        {
-            var lines = ReadCsv(logFile);
 
-            foreach (var a in lines)
-            {
-                // TODO
-
-            }
-
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns[(int)cell.name__________].Width = 90;
+            dataGridView1.Columns[(int)cell.map_variant___].Width = 90;
+            dataGridView1.Columns[(int)cell.map_variant_de].Width = 700;
+            dataGridView1.Columns[(int)cell.game_variant__].Width = 90;
+            dataGridView1.Columns[(int)cell.game_variant_d].Width = 90;
+            dataGridView1.Columns[(int)cell.enabled_______].Width = 90;
+            dataGridView1.Columns[(int)cell.playerCount___].Width = 90;
+            dataGridView1.Columns[(int)cell.comment_______].Width = 90;
+            dataGridView1.Columns[(int)cell.quality_______].Width = 90;
         }
         private void button1_Click_moveFiles(object sender, EventArgs e)
         {
-            var itemss = items;
+            var itemss = mapVariantsCollection;
 
         }
         private void button3_Click_locateMCC(object sender, EventArgs e)
@@ -142,7 +154,7 @@ namespace MCCHostTool
             if (MCCpath.Length == 0)
             {
                 toolStripStatusLabel1.Text = "WARNING: MCC path not selected. Use text box to enter MCC path.";
-                MCCpath = @"D:\DATA\REDLD\VG\Steam\steamapps\common\Halo The Master Chief Collection\";
+                MCCpath = @"E:\_DLD_Large\Games\DigitalRetail\SteamLibrary\steamapps\common\Halo The Master Chief Collection\";
             }
 
             if (!Directory.Exists(MCCpath))
@@ -153,46 +165,78 @@ namespace MCCHostTool
 
             var selectedTitle = comboBox2.SelectedItem as string;
 
-            items = new Dictionary<string, item>();
+            mapVariantsCollection = new Dictionary<string, item>();
+            gameVariantsCollection = new Dictionary<string, item>();
 
-            clog($"readBungieFiles(map_variants)");
+
+            // clog($"readBungieFiles(map_variants)");
             readBungieFiles("map_variants");
 
-            clog($"readBungieFiles(map_variants_library)");
+            // clog($"readBungieFiles(map_variants_library)");
             readBungieFiles("map_variants_library");
 
-            clog($"readBungieFiles(game_variants)");
+            // clog($"readBungieFiles(game_variants)");
             readBungieFiles("game_variants");
 
-            clog($"readBungieFiles(game_variants_library)");
+            // clog($"readBungieFiles(game_variants_library)");
             readBungieFiles("game_variants_library");
 
-            dataGridView1.Rows.Clear();
-            dataGridView1.Columns[0].Width = 90;
-            dataGridView1.Columns[1].Width = 90;
-            dataGridView1.Columns[2].Width = 700;
-            dataGridView1.Columns[3].Width = 90;
-            dataGridView1.Columns[4].Width = 90;
-            dataGridView1.Columns[5].Width = 90;
-            dataGridView1.Columns[6].Width = 90;
-            dataGridView1.Columns[7].Width = 90;
-            // dataGridView1.Columns[8].Width = 90;
+            // read from file first, then somehow merge with actual files
+            // would be good to checksum files to make sure it's the same version
+            readItemsList();
 
+            updateDataGridView1();
+        }
+        public void updateDataGridView1()
+        {
             int i = -1;
-            foreach (var a in items)
+            foreach (var a in mapVariantsCollection)
             {
                 i++;
                 dataGridView1.Rows.Add(a.Key);
-                dataGridView1.Rows[i].Cells[0].Value = a.Value.name;
-                dataGridView1.Rows[i].Cells[1].Value = a.Value.map_variant;
-                dataGridView1.Rows[i].Cells[2].Value = a.Value.map_variant_description;
-                dataGridView1.Rows[i].Cells[3].Value = a.Value.game_variant;
-                dataGridView1.Rows[i].Cells[4].Value = a.Value.game_variant_description;
-                dataGridView1.Rows[i].Cells[5].Value = a.Value.enabled;
-                dataGridView1.Rows[i].Cells[6].Value = a.Value.playerCount;
-                dataGridView1.Rows[i].Cells[7].Value = a.Value.comment;
-                dataGridView1.Rows[i].Cells[8].Value = a.Value.quality;
-                // dataGridView1.Rows[i].Cells[9].Value = a.Value.description;
+                dataGridView1.Rows[i].Cells[(int)cell.name__________].Value = a.Value.name__________;
+                dataGridView1.Rows[i].Cells[(int)cell.map_variant___].Value = a.Value.map_variant___;
+                dataGridView1.Rows[i].Cells[(int)cell.map_variant_de].Value = a.Value.map_variant_de;
+                dataGridView1.Rows[i].Cells[(int)cell.game_variant__].Value = a.Value.game_variant__;
+                dataGridView1.Rows[i].Cells[(int)cell.game_variant_d].Value = a.Value.game_variant_d;
+                dataGridView1.Rows[i].Cells[(int)cell.enabled_______].Value = a.Value.enabled_______;
+                dataGridView1.Rows[i].Cells[(int)cell.playerCount___].Value = a.Value.playerCount___;
+                dataGridView1.Rows[i].Cells[(int)cell.comment_______].Value = a.Value.comment_______;
+                dataGridView1.Rows[i].Cells[(int)cell.quality_______].Value = a.Value.quality_______;
+
+            }
+        }
+        private void readItemsList()
+        {
+            var lines = ReadCsv(logFile);
+
+            foreach (var a in lines)
+            {
+                var line = a.Split(";".ToCharArray()[0]);
+
+                string name__________ = line[(int)cell.name__________];
+                string map_variant___ = line[(int)cell.map_variant___];
+                string map_variant_de = line[(int)cell.map_variant_de];
+                string game_variant__ = line[(int)cell.game_variant__];
+                string game_variant_d = line[(int)cell.game_variant_d];
+                string enabled_______ = line[(int)cell.enabled_______];
+                string playerCount___ = line[(int)cell.playerCount___];
+                string comment_______ = line[(int)cell.comment_______];
+                string quality_______ = line[(int)cell.quality_______];
+
+                // TODO WARNING loss of data possible, if file doesn't exist
+                if (!mapVariantsCollection.ContainsKey(map_variant___))
+                {
+                    clog($"WARNING: missing settings in the config file for: {map_variant___}");
+                    continue;
+                }
+
+                mapVariantsCollection[map_variant___].game_variant__ = game_variant__;
+                mapVariantsCollection[map_variant___].game_variant_d = game_variant_d;
+
+                mapVariantsCollection[map_variant___].playerCount___ = playerCount___;
+                mapVariantsCollection[map_variant___].comment_______ = comment_______;
+                mapVariantsCollection[map_variant___].quality_______ = quality_______;
 
             }
 
@@ -202,147 +246,245 @@ namespace MCCHostTool
             var selectedTitle = comboBox2.SelectedItem as string;
             var MCCpath = folderBrowserDialog1.SelectedPath;
 
-            var mvarPath = $"{MCCpath}\\{selectedTitle}\\{path1}";
+            var MCCtitleFolder = $"{MCCpath}\\{selectedTitle}\\{path1}";
 
-            if (!Directory.Exists(mvarPath))
+            if (!Directory.Exists(MCCtitleFolder))
             {
-                toolStripStatusLabel1.Text = $"WARNING: missing {path1} folder: {mvarPath}";
+                toolStripStatusLabel1.Text = $"WARNING: missing {path1} folder: {MCCtitleFolder}";
                 return;
             }
 
-            var map_variantsFolder = Directory.EnumerateFiles($"{mvarPath}");
+            var filesFolder = Directory.EnumerateFiles($"{MCCtitleFolder}");
 
-            if (map_variantsFolder.Count() == 0)
+            if (filesFolder.Count() == 0)
             {
-                toolStripStatusLabel1.Text = $"{mvarPath} {map_variantsFolder.Count()}";
+                toolStripStatusLabel1.Text = $"{MCCtitleFolder} {filesFolder.Count()}";
                 return;
-            }   
-            
+            }
+
             var variant = new List<string>();
 
-            foreach (var a in map_variantsFolder)
+            foreach (var a in filesFolder)
                 variant.Add(new FileInfo(a).Name);
 
-            clog($"{path1}: {variant.Count()}");
+            //  clog($"path1: {path1}");
+            // clog($"{path1} count: {variant.Count()}");
 
             // foreach (var a in variant)
             //     clog($"{path1}: {a}");
 
-            if (path1 == "game_variants_library")
-            {
-                clog("game_variants_library");
-                foreach (var a in variant)
-                    gameVariantOverrides.Add(a);
-            }
-
             if (path1 == "map_variants")
             {
-                clog("map_variants");
-
                 foreach (var a in variant)
                 {
-                    var map_variant_description = $"{getMvarDescription($"{mvarPath}\\{a}")}";
+                    var map_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
 
-                    items.Add(a, new item
+                    // clog($"{path1}: {a}; {map_variant_description}");
+
+                    mapVariantsCollection.Add(a, new item
                     {
-                        name = $"{a}",
-                        map_variant = $"{a}",
-                        map_variant_description = map_variant_description,
-                        game_variant = $"",
-                        game_variant_description = $"",
-                        enabled = $"1",
-                        playerCount = $"",
-                        comment = $"",
-                        quality = $"",
-                        // description = $""
+                        name__________ = $"",
+                        map_variant___ = $"{a}",
+                        map_variant_de = map_variant_description,
+                        game_variant__ = $"",
+                        game_variant_d = $"",
+                        enabled_______ = $"1",
+                        playerCount___ = $"",
+                        comment_______ = $"",
+                        quality_______ = $"",
                     });
                 }
             }
 
             if (path1 == "map_variants_library")
             {
-                clog("map_variants_library");
-
                 foreach (var a in variant)
                 {
-                    var map_variant_description = $"{getMvarDescription($"{mvarPath}\\{a}")}";
+                    var map_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
 
-                    if (!items.ContainsKey(a))
-                    items.Add(a, new item
+                    // clog($"{path1}: {a}; {map_variant_description}");
+
+                    if (!mapVariantsCollection.ContainsKey(a))
+                        mapVariantsCollection.Add(a, new item
+                        {
+                            name__________ = $"",
+                            map_variant___ = $"{a}",
+                            map_variant_de = map_variant_description,
+                            game_variant__ = $"",
+                            game_variant_d = $"",
+                            enabled_______ = $"0",
+                            playerCount___ = $"",
+                            comment_______ = $"",
+                            quality_______ = $"",
+                        });
+                }
+            }
+
+            if (path1 == "game_variants")
+            {
+                foreach (var a in variant)
+                {
+                    var game_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
+
+                    // clog($"{path1}: {a}; {game_variant_description}");
+
+                    gameVariantsCollection.Add(a, new item
                     {
-                        name = $"{a}",
-                        map_variant = $"{a}",
-                        map_variant_description = map_variant_description,
-                        game_variant = $"",
-                        game_variant_description = $"",
-                        enabled = $"0",
-                        playerCount = $"",
-                        comment = $"",
-                        quality = $"",
-                        // description = $""
+                        name__________ = $"",
+                        map_variant___ = $"",
+                        map_variant_de = $"",
+                        game_variant__ = $"{a}",
+                        game_variant_d = game_variant_description,
+                        enabled_______ = $"1",
+                        playerCount___ = $"",
+                        comment_______ = $"",
+                        quality_______ = $"",
                     });
                 }
             }
 
+            if (path1 == "game_variants_library")
+            {
+                foreach (var a in variant)
+                {
+                    var game_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
+
+                    // clog($"{path1}: {a}; {game_variant_description}");
+
+                    if (!gameVariantsCollection.ContainsKey(a))
+                        gameVariantsCollection.Add(a, new item
+                        {
+                            name__________ = $"",
+                            map_variant___ = $"",
+                            map_variant_de = $"",
+                            game_variant__ = $"{a}",
+                            game_variant_d = game_variant_description,
+                            enabled_______ = $"0",
+                            playerCount___ = $"",
+                            comment_______ = $"",
+                            quality_______ = $"",
+                        });
+                }
+            }
+
+            fillComboboxWithGameVariantOverrides();
+
+        }
+        private void fillComboboxWithGameVariantOverrides()
+        {
+
+            // add the extra variants from the other folder to the combo box
+            foreach (var a in gameVariantsCollection)
+                gameVariantOverrides_list.Add(a.Key);
+
+            comboBox1_gameVariantOverrides.Items.Clear();
+            foreach (var a in gameVariantsCollection)
+                comboBox1_gameVariantOverrides.Items.Add($"{a.Key}: {a.Value.game_variant_d}");
+
         }
         private string getMvarDescription(string filepath)
         {
+            // Rech;
+            // TODO: it's different from other titles
+
             string output = "";
 
-            using (var reader = new BinaryReader(File.OpenRead(filepath)))
+            try
             {
-                var descriptionLength = 0x0130;
-                var descriptionOffset = 0x01C0;
-                var buffer = reader.ReadBytes(descriptionLength + descriptionOffset);
-
-                var outputLine = new List<string>();
-
-                var s = "";
-                // pass 2, find unicode strings
-                var i = 0;
-                while (true)
+                using (var reader = new BinaryReader(File.OpenRead(filepath)))
                 {
-                    var b = buffer[i + descriptionOffset];
-                    if (b == 0)
-                    {
-                        output = s;
-                        goto lbDone;
-                    }
+                    var descriptionLength = 0x0130;
+                    var descriptionOffset = 0x01C0;
+                    var buffer = reader.ReadBytes(descriptionLength + descriptionOffset);
 
-                    if (b < 0x1F || b > 0x7E)
+                    var outputLine = new List<string>();
+
+                    var s = "";
+                    // pass 2, find unicode strings
+                    var i = 0;
+                    while (true)
                     {
+                        var b = buffer[i + descriptionOffset];
+                        if (b == 0)
+                        {
+                            output = s;
+                            goto lbDone;
+                        }
+
+                        if (b < 0x1F || b > 0x7E)
+                        {
+                            i++;
+                            i++;
+                            goto fuckingcuntsusingbadchar;
+                        }
+
+                        s = $"{s}{(char)b}";
                         i++;
                         i++;
-                        goto fuckingcuntsusingbadchar;
+
+                        if (i == descriptionLength)
+                        {
+                            output = s;
+                            goto lbDone;
+                        }
+
+                    fuckingcuntsusingbadchar:
+                        ;
                     }
-
-                    s = $"{s}{(char)b}";
-                    i++;
-                    i++;
-
-                    if (i == descriptionLength)
-                    {
-                        output = s;
-                        goto lbDone;
-                    }
-
-                fuckingcuntsusingbadchar:
-                    ;
                 }
+
+            lbDone:
+
+                return output;
             }
-        lbDone:
+            catch (Exception e)
+            {
+                clog(e.Message);
+                return output;
+            }
 
-            return output;
         }
-
-        private void comboBox1_SelectedIndexChanged_overrideGameVariant(object sender, EventArgs e)
+        private void ComboBox1_OverrideGameVariant_changed()
         {
-            var combobox1_selectedIndex = 0;
-            var datagrid1_selectedIndex = 0;
+            // last: override game variants combobox is empty.
+            // use variant name for lookup.
+
+            // beaver_creek_cl_031.mvar;These forgotten structures were once the site of many bitter battles but have since been reclaimed by nature.  2-8 players
+            if (comboBox1_gameVariantOverrides.SelectedItem == null)
+                return;
 
             var gamevariantOverride = (comboBox1_gameVariantOverrides.SelectedItem).ToString();
-            clog($"gamevariantOverride {comboBox1_gameVariantOverrides.SelectedIndex} {gamevariantOverride}");
 
+            var newGameVariant = new item();
+
+            // clog($"gamevariantOverride {comboBox1_gameVariantOverrides.SelectedIndex} {gamevariantOverride}");
+
+            if (gamevariantOverride == null)
+                return;
+
+            int hits = 0;
+            foreach (var f in gameVariantsCollection)
+            {
+                if (gamevariantOverride.StartsWith(f.Key))
+                {
+                    hits++;
+                    newGameVariant = f.Value;
+                }
+            }
+
+            var d = dataGridView1.SelectedCells;
+            if (d.Count == 0)
+                return;
+
+            foreach (var e in d)
+            {
+                var f = (DataGridViewCell)e;
+                var ci = f.ColumnIndex;
+                var ri = f.RowIndex;
+
+                dataGridView1.Rows[ri].Cells[(int)cell.game_variant__].Value = newGameVariant.game_variant__;
+                dataGridView1.Rows[ri].Cells[(int)cell.game_variant_d].Value = newGameVariant.game_variant_d;
+            }
         }
         /// <summary>
         /// When a cell is modified, dump all contents to the settings file.
@@ -351,17 +493,36 @@ namespace MCCHostTool
         /// <param name="e"></param>
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            dumpSettings();
+
+        }
+        private void textBox2_TextChanged_overrideFilter(object sender, EventArgs e)
+        {
+            comboBox1_gameVariantOverrides.Items.Clear();
+            foreach (var a in gameVariantOverrides_list)
+            {
+                string b = a.ToLower();
+                if (b.Contains(textBox2.Text))
+                    comboBox1_gameVariantOverrides.Items.Add(a);
+            }
+
+
+        }
+        private void dumpSettings()
+        {
+            clog($"dumpSettings");
+
             List<string> output = new List<string>();
 
-            var getDataTest0 = dataGridView1.Rows[0].Cells[0].Value as string;
-            var getDataTest1 = dataGridView1.Rows[0].Cells[1].Value as string;
-            var getDataTest2 = dataGridView1.Rows[0].Cells[2].Value as string;
-            var getDataTest3 = dataGridView1.Rows[0].Cells[3].Value as string;
-            var getDataTest4 = dataGridView1.Rows[0].Cells[4].Value as string;
-            var getDataTest5 = dataGridView1.Rows[0].Cells[5].Value as string;
-            var getDataTest6 = dataGridView1.Rows[0].Cells[6].Value as string;
-            var getDataTest7 = dataGridView1.Rows[0].Cells[7].Value as string;
-            var getDataTest8 = dataGridView1.Rows[0].Cells[8].Value as string;
+            var getDataTest0 = dataGridView1.Rows[0].Cells[(int)cell.name__________].Value as string;
+            var getDataTest1 = dataGridView1.Rows[0].Cells[(int)cell.map_variant___].Value as string;
+            var getDataTest2 = dataGridView1.Rows[0].Cells[(int)cell.map_variant_de].Value as string;
+            var getDataTest3 = dataGridView1.Rows[0].Cells[(int)cell.game_variant__].Value as string;
+            var getDataTest4 = dataGridView1.Rows[0].Cells[(int)cell.game_variant_d].Value as string;
+            var getDataTest5 = dataGridView1.Rows[0].Cells[(int)cell.enabled_______].Value as string;
+            var getDataTest6 = dataGridView1.Rows[0].Cells[(int)cell.playerCount___].Value as string;
+            var getDataTest7 = dataGridView1.Rows[0].Cells[(int)cell.comment_______].Value as string;
+            var getDataTest8 = dataGridView1.Rows[0].Cells[(int)cell.quality_______].Value as string;
 
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
@@ -369,45 +530,61 @@ namespace MCCHostTool
 
                 if (row.Cells[0].Value == null)
                     continue;
+                string name__________ = "";
+                string map_variant___ = "";
+                string map_variant_de = "";
+                string game_variant__ = "";
+                string game_variant_d = "";
+                string enabled_______ = "";
+                string playerCount___ = "";
+                string comment_______ = "";
+                string quality_______ = "";
 
-                string name_ = row.Cells[0].Value.ToString();
-                string map_variant = row.Cells[1].Value.ToString();
-                string map_variant_description = row.Cells[2].Value.ToString();
-                string game_variant = row.Cells[3].Value.ToString();
-                string game_variant_description = row.Cells[4].Value.ToString();
-                string enabled = row.Cells[5].Value.ToString();
-                string playerCount = row.Cells[6].Value.ToString();
-                string comment = row.Cells[7].Value.ToString();
-                string quality = row.Cells[8].Value.ToString();
-                // string description = row.Cells[7].Value.ToString();
+                if (row.Cells[(int)cell.name__________].Value == null) row.Cells[(int)cell.name__________].Value = "";
+                if (row.Cells[(int)cell.map_variant___].Value == null) row.Cells[(int)cell.map_variant___].Value = "";
+                if (row.Cells[(int)cell.map_variant_de].Value == null) row.Cells[(int)cell.map_variant_de].Value = "";
+                if (row.Cells[(int)cell.game_variant__].Value == null) row.Cells[(int)cell.game_variant__].Value = "";
+                if (row.Cells[(int)cell.game_variant_d].Value == null) row.Cells[(int)cell.game_variant_d].Value = "";
+                if (row.Cells[(int)cell.enabled_______].Value == null) row.Cells[(int)cell.enabled_______].Value = "";
+                if (row.Cells[(int)cell.playerCount___].Value == null) row.Cells[(int)cell.playerCount___].Value = "";
+                if (row.Cells[(int)cell.comment_______].Value == null) row.Cells[(int)cell.comment_______].Value = "";
+                if (row.Cells[(int)cell.quality_______].Value == null) row.Cells[(int)cell.quality_______].Value = "";
+
+                name__________ = row.Cells[(int)cell.name__________].Value.ToString();
+                map_variant___ = row.Cells[(int)cell.map_variant___].Value.ToString();
+                map_variant_de = row.Cells[(int)cell.map_variant_de].Value.ToString();
+                game_variant__ = row.Cells[(int)cell.game_variant__].Value.ToString();
+                game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
+                enabled_______ = row.Cells[(int)cell.enabled_______].Value.ToString();
+                playerCount___ = row.Cells[(int)cell.playerCount___].Value.ToString();
+                comment_______ = row.Cells[(int)cell.comment_______].Value.ToString();
+                quality_______ = row.Cells[(int)cell.quality_______].Value.ToString();
+
+                // i need to learn a compact way to do this
+
                 string outputline =
-                    $"{name_};" +
-                    $"{map_variant};" +
-                    $"{map_variant_description};" +
-                    $"{game_variant};" +
-                    $"{game_variant_description};" +
-                    $"{enabled};" +
-                    $"{playerCount};" +
-                    $"{comment};" +
-                    $"{quality};";
+                    $"{name__________};" +
+                    $"{map_variant___};" +
+                    $"{map_variant_de};" +
+                    $"{game_variant__};" +
+                    $"{game_variant_d};" +
+                    $"{enabled_______};" +
+                    $"{playerCount___};" +
+                    $"{comment_______};" +
+                    $"{quality_______};";
 
                 output.Add(outputline);
                 // $"{description}";
             }
 
             WriteCsv(output, logFile);
-
         }
-        private void textBox2_TextChanged_overrideFilter(object sender, EventArgs e)
+
+        private void comboBox1_gameVariantOverrides_SelectedValueChanged(object sender, EventArgs e)
         {
-            comboBox1_gameVariantOverrides.Items.Clear();
-            foreach (var a in gameVariantOverrides)
-            {
-                string b = a.ToLower();
-                if (b.Contains(textBox2.Text))
-                    comboBox1_gameVariantOverrides.Items.Add(a);
-            }
+            // clog($"comboBox1_gameVariantOverrides_SelectedValueChanged().dumpSettings()");
+            ComboBox1_OverrideGameVariant_changed();
+            dumpSettings();
         }
-
     }
 }

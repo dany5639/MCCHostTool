@@ -34,6 +34,14 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             dataGridView1 = new DataGridView();
+            button3 = new Button();
+            folderBrowserDialog1 = new FolderBrowserDialog();
+            richTextBox1 = new RichTextBox();
+            comboBox1_gameVariantOverrides = new ComboBox();
+            label1 = new Label();
+            comboBox2 = new ComboBox();
+            label2 = new Label();
+            textBox2 = new TextBox();
             Column1 = new DataGridViewTextBoxColumn();
             Column2 = new DataGridViewTextBoxColumn();
             Column9 = new DataGridViewTextBoxColumn();
@@ -43,15 +51,6 @@
             Column5 = new DataGridViewTextBoxColumn();
             Column6 = new DataGridViewTextBoxColumn();
             Column7 = new DataGridViewTextBoxColumn();
-            Column8 = new DataGridViewTextBoxColumn();
-            button3 = new Button();
-            folderBrowserDialog1 = new FolderBrowserDialog();
-            richTextBox1 = new RichTextBox();
-            comboBox1_gameVariantOverrides = new ComboBox();
-            label1 = new Label();
-            comboBox2 = new ComboBox();
-            label2 = new Label();
-            textBox2 = new TextBox();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -84,7 +83,7 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(944, 23);
             textBox1.TabIndex = 2;
-            textBox1.Text = "D:\\DATA\\REDLD\\VG\\Steam\\steamapps\\common\\Halo The Master Chief Collection\\";
+            textBox1.Text = "E:\\_DLD_Large\\Games\\DigitalRetail\\SteamLibrary\\steamapps\\common\\Halo The Master Chief Collection\\";
             // 
             // statusStrip1
             // 
@@ -105,7 +104,7 @@
             // 
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Column9, Column3, Column10, Column4, Column5, Column6, Column7, Column8 });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Column9, Column3, Column10, Column4, Column5, Column6, Column7 });
             dataGridView1.ImeMode = ImeMode.Off;
             dataGridView1.Location = new Point(12, 76);
             dataGridView1.Name = "dataGridView1";
@@ -113,6 +112,71 @@
             dataGridView1.Size = new Size(1050, 506);
             dataGridView1.TabIndex = 9;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(12, 11);
+            button3.Name = "button3";
+            button3.Size = new Size(100, 23);
+            button3.TabIndex = 10;
+            button3.Text = "Locate MCC";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click_locateMCC;
+            // 
+            // richTextBox1
+            // 
+            richTextBox1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            richTextBox1.Location = new Point(12, 76);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.Size = new Size(1050, 506);
+            richTextBox1.TabIndex = 11;
+            richTextBox1.Text = "";
+            // 
+            // comboBox1_gameVariantOverrides
+            // 
+            comboBox1_gameVariantOverrides.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            comboBox1_gameVariantOverrides.FormattingEnabled = true;
+            comboBox1_gameVariantOverrides.Location = new Point(324, 584);
+            comboBox1_gameVariantOverrides.Name = "comboBox1_gameVariantOverrides";
+            comboBox1_gameVariantOverrides.Size = new Size(635, 23);
+            comboBox1_gameVariantOverrides.TabIndex = 12;
+            comboBox1_gameVariantOverrides.SelectedValueChanged += comboBox1_gameVariantOverrides_SelectedValueChanged;
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label1.AutoSize = true;
+            label1.Location = new Point(224, 592);
+            label1.Name = "label1";
+            label1.Size = new Size(94, 15);
+            label1.TabIndex = 13;
+            label1.Text = "Override variant:";
+            // 
+            // comboBox2
+            // 
+            comboBox2.FormattingEnabled = true;
+            comboBox2.Location = new Point(118, 40);
+            comboBox2.Name = "comboBox2";
+            comboBox2.Size = new Size(151, 23);
+            comboBox2.TabIndex = 14;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 43);
+            label2.Name = "label2";
+            label2.Size = new Size(38, 15);
+            label2.TabIndex = 15;
+            label2.Text = "Game";
+            // 
+            // textBox2
+            // 
+            textBox2.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            textBox2.Location = new Point(965, 584);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(97, 23);
+            textBox2.TabIndex = 16;
+            textBox2.TextChanged += textBox2_TextChanged_overrideFilter;
             // 
             // Column1
             // 
@@ -159,76 +223,6 @@
             Column7.HeaderText = "Good or bad";
             Column7.Name = "Column7";
             // 
-            // Column8
-            // 
-            Column8.HeaderText = "File description";
-            Column8.Name = "Column8";
-            // 
-            // button3
-            // 
-            button3.Location = new Point(12, 11);
-            button3.Name = "button3";
-            button3.Size = new Size(100, 23);
-            button3.TabIndex = 10;
-            button3.Text = "Locate MCC";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click_locateMCC;
-            // 
-            // richTextBox1
-            // 
-            richTextBox1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            richTextBox1.Location = new Point(12, 76);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1050, 506);
-            richTextBox1.TabIndex = 11;
-            richTextBox1.Text = "";
-            // 
-            // comboBox1_gameVariantOverrides
-            // 
-            comboBox1_gameVariantOverrides.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            comboBox1_gameVariantOverrides.FormattingEnabled = true;
-            comboBox1_gameVariantOverrides.Location = new Point(324, 584);
-            comboBox1_gameVariantOverrides.Name = "comboBox1_gameVariantOverrides";
-            comboBox1_gameVariantOverrides.Size = new Size(635, 23);
-            comboBox1_gameVariantOverrides.TabIndex = 12;
-            comboBox1_gameVariantOverrides.SelectedIndexChanged += comboBox1_SelectedIndexChanged_overrideGameVariant;
-            // 
-            // label1
-            // 
-            label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label1.AutoSize = true;
-            label1.Location = new Point(224, 592);
-            label1.Name = "label1";
-            label1.Size = new Size(94, 15);
-            label1.TabIndex = 13;
-            label1.Text = "Override variant:";
-            // 
-            // comboBox2
-            // 
-            comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(118, 40);
-            comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(151, 23);
-            comboBox2.TabIndex = 14;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(12, 43);
-            label2.Name = "label2";
-            label2.Size = new Size(38, 15);
-            label2.TabIndex = 15;
-            label2.Text = "Game";
-            // 
-            // textBox2
-            // 
-            textBox2.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            textBox2.Location = new Point(965, 584);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(97, 23);
-            textBox2.TabIndex = 16;
-            textBox2.TextChanged += textBox2_TextChanged_overrideFilter;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -270,6 +264,7 @@
         private Label label1;
         private ComboBox comboBox2;
         private Label label2;
+        private TextBox textBox2;
         private DataGridViewTextBoxColumn Column1;
         private DataGridViewTextBoxColumn Column2;
         private DataGridViewTextBoxColumn Column9;
@@ -279,7 +274,5 @@
         private DataGridViewTextBoxColumn Column5;
         private DataGridViewTextBoxColumn Column6;
         private DataGridViewTextBoxColumn Column7;
-        private DataGridViewTextBoxColumn Column8;
-        private TextBox textBox2;
     }
 }
