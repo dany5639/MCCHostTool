@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dani_\\source\\repos\\MCCHostTool\\MCCHostTool.csproj",
+      "projectUniqueName": "C:\\Users\\dani_\\Documents\\GitHub\\MCCHostTool\\MCCHostTool.csproj",
       "projectName": "MCCHostTool",
-      "projectPath": "C:\\Users\\dani_\\source\\repos\\MCCHostTool\\MCCHostTool.csproj",
+      "projectPath": "C:\\Users\\dani_\\Documents\\GitHub\\MCCHostTool\\MCCHostTool.csproj",
       "packagesPath": "C:\\Users\\dani_\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dani_\\source\\repos\\MCCHostTool\\obj\\",
+      "outputPath": "C:\\Users\\dani_\\Documents\\GitHub\\MCCHostTool\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -34,14 +34,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             dataGridView1 = new DataGridView();
-            button3 = new Button();
-            folderBrowserDialog1 = new FolderBrowserDialog();
-            richTextBox1 = new RichTextBox();
-            comboBox1_gameVariantOverrides = new ComboBox();
-            label1 = new Label();
-            comboBox2 = new ComboBox();
-            label2 = new Label();
-            textBox2 = new TextBox();
             Column1 = new DataGridViewTextBoxColumn();
             Column2 = new DataGridViewTextBoxColumn();
             Column9 = new DataGridViewTextBoxColumn();
@@ -51,6 +43,14 @@
             Column5 = new DataGridViewTextBoxColumn();
             Column6 = new DataGridViewTextBoxColumn();
             Column7 = new DataGridViewTextBoxColumn();
+            button3 = new Button();
+            folderBrowserDialog1 = new FolderBrowserDialog();
+            richTextBox1 = new RichTextBox();
+            comboBox1_gameVariantOverrides = new ComboBox();
+            label1 = new Label();
+            comboBox2 = new ComboBox();
+            label2 = new Label();
+            textBox2 = new TextBox();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -111,7 +111,53 @@
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.Size = new Size(1050, 506);
             dataGridView1.TabIndex = 9;
+            dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
+            // 
+            // Column1
+            // 
+            Column1.HeaderText = "Name";
+            Column1.Name = "Column1";
+            // 
+            // Column2
+            // 
+            Column2.HeaderText = "Map variant";
+            Column2.Name = "Column2";
+            // 
+            // Column9
+            // 
+            Column9.HeaderText = "Map description";
+            Column9.Name = "Column9";
+            // 
+            // Column3
+            // 
+            Column3.HeaderText = "Game variant";
+            Column3.Name = "Column3";
+            // 
+            // Column10
+            // 
+            Column10.HeaderText = "Game description";
+            Column10.Name = "Column10";
+            // 
+            // Column4
+            // 
+            Column4.HeaderText = "Enabled";
+            Column4.Name = "Column4";
+            // 
+            // Column5
+            // 
+            Column5.HeaderText = "Player count";
+            Column5.Name = "Column5";
+            // 
+            // Column6
+            // 
+            Column6.HeaderText = "Comments";
+            Column6.Name = "Column6";
+            // 
+            // Column7
+            // 
+            Column7.HeaderText = "Good or bad";
+            Column7.Name = "Column7";
             // 
             // button3
             // 
@@ -159,6 +205,7 @@
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(151, 23);
             comboBox2.TabIndex = 14;
+            comboBox2.SelectedValueChanged += comboBox2_SelectedValueChanged;
             // 
             // label2
             // 
@@ -177,51 +224,6 @@
             textBox2.Size = new Size(97, 23);
             textBox2.TabIndex = 16;
             textBox2.TextChanged += textBox2_TextChanged_overrideFilter;
-            // 
-            // Column1
-            // 
-            Column1.HeaderText = "Name";
-            Column1.Name = "Column1";
-            // 
-            // Column2
-            // 
-            Column2.HeaderText = "Map variant";
-            Column2.Name = "Column2";
-            // 
-            // Column9
-            // 
-            Column9.HeaderText = "Map description";
-            Column9.Name = "Column9";
-            // 
-            // Column3
-            // 
-            Column3.HeaderText = "Game variant";
-            Column3.Name = "Column3";
-            // 
-            // Column10
-            // 
-            Column10.HeaderText = "Game description";
-            Column10.Name = "Column10";
-            // 
-            // Column4
-            // 
-            Column4.HeaderText = "Enabled";
-            Column4.Name = "Column4";
-            // 
-            // Column5
-            // 
-            Column5.HeaderText = "Player count";
-            Column5.Name = "Column5";
-            // 
-            // Column6
-            // 
-            Column6.HeaderText = "Comments";
-            Column6.Name = "Column6";
-            // 
-            // Column7
-            // 
-            Column7.HeaderText = "Good or bad";
-            Column7.Name = "Column7";
             // 
             // Form1
             // 
