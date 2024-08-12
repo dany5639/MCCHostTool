@@ -10,9 +10,9 @@ namespace MCCHostTool
         private Dictionary<string, item> mapVariantsCollection;
         private Dictionary<string, item> gameVariantsCollection;
         public List<string> gameVariantOverrides_list = new List<string>();
-        public string MCCpath = "";
-        public string selectedTitle = "";
-        public string MCCtitleFolder = "";
+        public string rootPath = "";
+        public string gameTitle = "";
+        public string absoluteVariantsPath = "";
 
         #region utilities
         private static void clog(string in_)
@@ -145,18 +145,18 @@ namespace MCCHostTool
         }
         private void button3_Click_locateMCC(object sender, EventArgs e)
         {
-            folderBrowserDialog1.SelectedPath = MCCpath;
+            folderBrowserDialog1.SelectedPath = rootPath;
             folderBrowserDialog1.ShowDialog();
 
-            MCCpath = folderBrowserDialog1.SelectedPath;
+            rootPath = folderBrowserDialog1.SelectedPath;
 
-            if (MCCpath.Length == 0)
+            if (rootPath.Length == 0)
             {
                 toolStripStatusLabel1.Text = "WARNING: MCC path not selected. Use text box to enter MCC path.";
-                MCCpath = @"E:\_DLD_Large\Games\DigitalRetail\SteamLibrary\steamapps\common\Halo The Master Chief Collection\";
+                rootPath = @"E:\_DLD_Large\Games\DigitalRetail\SteamLibrary\steamapps\common\Halo The Master Chief Collection\";
             }
 
-            if (!Directory.Exists(MCCpath))
+            if (!Directory.Exists(rootPath))
             {
                 toolStripStatusLabel1.Text = "WARNING: MCC path incorrect.";
                 return;
@@ -168,17 +168,15 @@ namespace MCCHostTool
 
             mapVariantsCollection = new Dictionary<string, item>();
             gameVariantsCollection = new Dictionary<string, item>();
+            gameVariantOverrides_list = new List<string>();
 
-            // clog($"readBungieFiles(map_variants)");
+
             readBungieFiles("map_variants");
 
-            // clog($"readBungieFiles(map_variants_library)");
             readBungieFiles("map_variants_library");
 
-            // clog($"readBungieFiles(game_variants)");
             readBungieFiles("game_variants");
 
-            // clog($"readBungieFiles(game_variants_library)");
             readBungieFiles("game_variants_library");
 
             // read from file first, then somehow merge with actual files
@@ -247,36 +245,33 @@ namespace MCCHostTool
             }
 
         }
-        public void readBungieFiles(string path1)
+        public void readBungieFiles(string variantsFolder)
         {
-            clog(path1);
 
-            selectedTitle = comboBox2.SelectedItem as string;
-            MCCpath = folderBrowserDialog1.SelectedPath;
+            gameTitle = comboBox2.SelectedItem as string;
+            rootPath = folderBrowserDialog1.SelectedPath;
 
-            MCCtitleFolder = $"{MCCpath}\\{selectedTitle}\\{path1}";
+            absoluteVariantsPath = $"{rootPath}\\{gameTitle}\\{variantsFolder}";
 
-            if (!Directory.Exists(MCCtitleFolder))
+
+            if (!Directory.Exists(absoluteVariantsPath))
             {
-                toolStripStatusLabel1.Text = $"WARNING: missing {path1} folder: {MCCtitleFolder}";
+                toolStripStatusLabel1.Text = $"WARNING: missing {variantsFolder} folder: {absoluteVariantsPath}.";
                 return;
             }
 
-            Directory.CreateDirectory($"{MCCpath}\\{selectedTitle}\\map_variants_library\\");
-            Directory.CreateDirectory($"{MCCpath}\\{selectedTitle}\\game_variants_library\\");
+            var variantsFiles = Directory.EnumerateFiles($"{absoluteVariantsPath}");
 
-            var filesFolder = Directory.EnumerateFiles($"{MCCtitleFolder}");
-
-            if (filesFolder.Count() == 0)
+            if (variantsFiles.Count() == 0)
             {
-                toolStripStatusLabel1.Text = $"{MCCtitleFolder} {filesFolder.Count()}";
+                toolStripStatusLabel1.Text = $"{absoluteVariantsPath}: {variantsFiles.Count()} files.";
                 return;
             }
 
-            var variant = new List<string>();
+            var variantsList = new List<string>();
 
-            foreach (var a in filesFolder)
-                variant.Add(new FileInfo(a).Name);
+            foreach (var a in variantsFiles)
+                variantsList.Add(new FileInfo(a).Name);
 
             //  clog($"path1: {path1}");
             // clog($"{path1} count: {variant.Count()}");
@@ -284,101 +279,60 @@ namespace MCCHostTool
             // foreach (var a in variant)
             //     clog($"{path1}: {a}");
 
-            if (path1.Contains("FK 5 Chambers.mvar"))
+            if (variantsList.Contains("FK 5 Chambers.mvar"))
+                ;
+            if (variantsList.Contains("INF Dead Space.mvar"))
                 ;
 
-            if (path1 == "map_variants")
+            clog($"readBungieFiles({variantsFolder})\n" +
+                $"rootPath: {rootPath}\n" +
+                $"gameTitle: {gameTitle}\n" +
+                $"absoluteVariantsPath: {absoluteVariantsPath}\n" +
+                $"variantsFiles.Count(): {variantsFiles.Count()}\n" +
+                $"");
+
+            foreach (var variant in variantsList)
             {
-                foreach (var a in variant)
+                var variantDescription = $"{readVariantFile($"{absoluteVariantsPath}\\{variant}")}";
+
+                // clog($"{path1}: {a}; {map_variant_description}");
+
+                var newVariant = new item
                 {
-                    var map_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
+                    gameTitle_____ = $"{gameTitle}",
+                    playerCount___ = $"",
+                    comment_______ = $"",
+                    quality_______ = $"",
+                };
 
-                    // clog($"{path1}: {a}; {map_variant_description}");
-
-                    mapVariantsCollection.Add(a, new item
-                    {
-                        gameTitle_____ = $"{selectedTitle}",
-                        map_variant___ = $"{a}",
-                        map_variant_de = map_variant_description,
-                        game_variant__ = $"",
-                        game_variant_d = $"",
-                        enabled_______ = $"1",
-                        playerCount___ = $"",
-                        comment_______ = $"",
-                        quality_______ = $"",
-                    });
-                }
-            }
-
-            if (path1 == "map_variants_library")
-            {
-                foreach (var a in variant)
+                switch (variantsFolder)
                 {
-                    var map_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
-
-                    // clog($"{path1}: {a}; {map_variant_description}");
-
-                    if (!mapVariantsCollection.ContainsKey(a))
-                        mapVariantsCollection.Add(a, new item
-                        {
-                            gameTitle_____ = $"{selectedTitle}",
-                            map_variant___ = $"{a}",
-                            map_variant_de = map_variant_description,
-                            game_variant__ = $"",
-                            game_variant_d = $"",
-                            enabled_______ = $"0",
-                            playerCount___ = $"",
-                            comment_______ = $"",
-                            quality_______ = $"",
-                        });
+                    case "map_variants":
+                        newVariant.enabled_______ = "1";
+                        goto r_map_variants_library;
+                    case "map_variants_library":
+                        r_map_variants_library:
+                        newVariant.map_variant___ = variant;
+                        newVariant.map_variant_de = variantDescription;
+                        if (!mapVariantsCollection.ContainsKey(variant))
+                            mapVariantsCollection.Add(variant, newVariant);
+                        goto done1;
+                    case "game_variants":
+                        newVariant.enabled_______ = "0";
+                        goto r_game_variants_library;
+                    case "game_variants_library":
+                        r_game_variants_library:
+                        newVariant.game_variant__ = variant;
+                        newVariant.game_variant_d = variantDescription;
+                        if (!gameVariantsCollection.ContainsKey(variant))
+                            gameVariantsCollection.Add(variant, newVariant);
+                        goto done1;
+                    default:
+                        throw new Exception();
                 }
-            }
 
-            if (path1 == "game_variants")
-            {
-                foreach (var a in variant)
-                {
-                    var game_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
-
-                    // clog($"{path1}: {a}; {game_variant_description}");
-
-                    gameVariantsCollection.Add(a, new item
-                    {
-                        gameTitle_____ = $"{selectedTitle}",
-                        map_variant___ = $"",
-                        map_variant_de = $"",
-                        game_variant__ = $"{a}",
-                        game_variant_d = game_variant_description,
-                        enabled_______ = $"1",
-                        playerCount___ = $"",
-                        comment_______ = $"",
-                        quality_______ = $"",
-                    });
-                }
-            }
-
-            if (path1 == "game_variants_library")
-            {
-                foreach (var a in variant)
-                {
-                    var game_variant_description = $"{getMvarDescription($"{MCCtitleFolder}\\{a}")}";
-
-                    // clog($"{path1}: {a}; {game_variant_description}");
-
-                    if (!gameVariantsCollection.ContainsKey(a))
-                        gameVariantsCollection.Add(a, new item
-                        {
-                            gameTitle_____ = $"{selectedTitle}",
-                            map_variant___ = $"",
-                            map_variant_de = $"",
-                            game_variant__ = $"{a}",
-                            game_variant_d = game_variant_description,
-                            enabled_______ = $"0",
-                            playerCount___ = $"",
-                            comment_______ = $"",
-                            quality_______ = $"",
-                        });
-                }
+            done1:
+                ;
             }
 
             fillComboboxWithGameVariantOverrides();
@@ -396,7 +350,7 @@ namespace MCCHostTool
                 comboBox1_gameVariantOverrides.Items.Add($"{a.Key}: {a.Value.game_variant_d}");
 
         }
-        public string getMvarDescription(string filepath)
+        public string readVariantFile(string filepath)
         {
             // Rech;
             // TODO: it's different from other titles
@@ -406,9 +360,13 @@ namespace MCCHostTool
             {
                 using (var reader = new BinaryReader(File.OpenRead(filepath)))
                 {
+                    // H3 is big endian
+                    // reach are small endian
+                    // or the other way
+
                     var descriptionLength = 0x0130;
                     var descriptionOffset = 0x01C0;
-                    switch (selectedTitle)
+                    switch (gameTitle)
                     {
                         case "halo3": // still broken but it makes absolutely no sense
                             descriptionOffset = 0x0B0;
@@ -628,10 +586,10 @@ namespace MCCHostTool
                 var map_variant___ = a.Value.map_variant___;
                 var game_variant__ = a.Value.game_variant__;
 
-                var path1 = $"{MCCpath}\\{selectedTitle}\\map_variants\\{map_variant___}";
-                var path2 = $"{MCCpath}\\{selectedTitle}\\map_variants_library\\{map_variant___}";
-                var path3 = $"{MCCpath}\\{selectedTitle}\\game_variants\\{game_variant__}";
-                var path4 = $"{MCCpath}\\{selectedTitle}\\game_variants_library\\{game_variant__}";
+                var path1 = $"{rootPath}\\{gameTitle}\\map_variants\\{map_variant___}";
+                var path2 = $"{rootPath}\\{gameTitle}\\map_variants_library\\{map_variant___}";
+                var path3 = $"{rootPath}\\{gameTitle}\\game_variants\\{game_variant__}";
+                var path4 = $"{rootPath}\\{gameTitle}\\game_variants_library\\{game_variant__}";
 
                 var enabled = a.Value.enabled_______;
 
@@ -727,7 +685,7 @@ namespace MCCHostTool
 
         private void comboBox2_SelectedValueChanged(object sender, EventArgs e)
         {
-            selectedTitle = comboBox2.SelectedItem as string;
+            gameTitle = comboBox2.SelectedItem as string;
         }
     }
 }
