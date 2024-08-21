@@ -1,4 +1,6 @@
 using Microsoft.VisualBasic.Logging;
+using System.Collections;
+using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -126,7 +128,7 @@ namespace MCCHostTool
                 comboBox2.Items.Add(a);
 
 #if DEBUG
-            comboBox2.SelectedIndex = comboBox2.Items.Count - 1;
+            comboBox2.SelectedIndex = 3;
 #endif
 
             // TODO: never used
@@ -234,9 +236,9 @@ namespace MCCHostTool
 
                 mapVariantsCollection[map_variant___].gameTitle_____ = gameTitle_____;
                 mapVariantsCollection[map_variant___].map_variant___ = map_variant___;
-                mapVariantsCollection[map_variant___].map_variant_de = map_variant_de;
+                // mapVariantsCollection[map_variant___].map_variant_de = map_variant_de;
                 mapVariantsCollection[map_variant___].game_variant__ = game_variant__;
-                mapVariantsCollection[map_variant___].game_variant_d = game_variant_d;
+                // mapVariantsCollection[map_variant___].game_variant_d = game_variant_d;
                 mapVariantsCollection[map_variant___].enabled_______ = enabled_______;
                 mapVariantsCollection[map_variant___].playerCount___ = playerCount___;
                 mapVariantsCollection[map_variant___].comment_______ = comment_______;
@@ -279,10 +281,6 @@ namespace MCCHostTool
             // foreach (var a in variant)
             //     clog($"{path1}: {a}");
 
-            if (variantsList.Contains("FK 5 Chambers.mvar"))
-                ;
-            if (variantsList.Contains("INF Dead Space.mvar"))
-                ;
 
             clog($"readBungieFiles({variantsFolder})\n" +
                 $"rootPath: {rootPath}\n" +
@@ -293,7 +291,51 @@ namespace MCCHostTool
 
             foreach (var variant in variantsList)
             {
-                var variantDescription = $"{readVariantFile($"{absoluteVariantsPath}\\{variant}")}";
+                if (variant.ToLower().Contains("legacy_arena_foundry_kentuckyTango"))
+                    ;
+
+                var variantDescription = "";
+
+                switch (gameTitle)
+                {
+                    case "halo3":
+                        switch (variantsFolder)
+                        {
+                            case "map_variants":
+                            case "map_variants_library":
+                                variantDescription = $"{readH3mvar($"{absoluteVariantsPath}\\{variant}")}";
+                                goto done1;
+                            case "game_variants":
+                            case "game_variants_library":
+                                variantDescription = $"{readH3gameVar($"{absoluteVariantsPath}\\{variant}")}";
+                                goto done1;
+                            default:
+                                throw new Exception();
+                        }
+                    case "haloreach":
+                        // switch (variantsFolder)
+                        // {
+                        //     case "map_variants":
+                        //     case "map_variants_library":
+                        //         variantDescription = $"{readH3mvar($"{absoluteVariantsPath}\\{variant}")}";
+                        //         goto done1;
+                        //     case "game_variants":
+                        //     case "game_variants_library":
+                        //         variantDescription = $"{readH3gameVar($"{absoluteVariantsPath}\\{variant}")}";
+                        //         goto done1;
+                        //     default:
+                        //         throw new Exception();
+                        // }
+
+                        variantDescription = $"{readHRmvar($"{absoluteVariantsPath}\\{variant}")}";
+                        break;
+                    default:
+                        throw new Exception();
+
+                }
+
+            done1:
+                ;
 
                 // clog($"{path1}: {a}; {map_variant_description}");
 
@@ -311,31 +353,43 @@ namespace MCCHostTool
                         newVariant.enabled_______ = "1";
                         goto r_map_variants_library;
                     case "map_variants_library":
-                        r_map_variants_library:
+                    r_map_variants_library:
                         newVariant.map_variant___ = variant;
                         newVariant.map_variant_de = variantDescription;
                         if (!mapVariantsCollection.ContainsKey(variant))
                             mapVariantsCollection.Add(variant, newVariant);
-                        goto done1;
+                        goto done2;
                     case "game_variants":
                         newVariant.enabled_______ = "0";
                         goto r_game_variants_library;
                     case "game_variants_library":
-                        r_game_variants_library:
+                    r_game_variants_library:
                         newVariant.game_variant__ = variant;
                         newVariant.game_variant_d = variantDescription;
                         if (!gameVariantsCollection.ContainsKey(variant))
                             gameVariantsCollection.Add(variant, newVariant);
-                        goto done1;
+                        goto done2;
                     default:
                         throw new Exception();
                 }
 
-            done1:
+            done2:
                 ;
+
             }
 
-            fillComboboxWithGameVariantOverrides();
+            switch (variantsFolder)
+            {
+                case "game_variants": 
+                case "game_variants_library":
+                    fillComboboxWithGameVariantOverrides();
+                    goto done3;
+                default:
+                    goto done3;
+            }
+
+        done3:
+            ;
 
         }
         private void fillComboboxWithGameVariantOverrides()
@@ -350,12 +404,11 @@ namespace MCCHostTool
                 comboBox1_gameVariantOverrides.Items.Add($"{a.Key}: {a.Value.game_variant_d}");
 
         }
-        public string readVariantFile(string filepath)
+        public string readH3mvar(string filepath)
         {
-            // Rech;
-            // TODO: it's different from other titles
             string output = "";
-
+            string mapname = "";
+            string mapDescription = "";
             try
             {
                 using (var reader = new BinaryReader(File.OpenRead(filepath)))
@@ -364,56 +417,62 @@ namespace MCCHostTool
                     // reach are small endian
                     // or the other way
 
-                    var descriptionLength = 0x0130;
-                    var descriptionOffset = 0x01C0;
-                    switch (gameTitle)
-                    {
-                        case "halo3": // still broken but it makes absolutely no sense
-                            descriptionOffset = 0x0B0;
-                            break;
-                        case "haloreach":
-                            descriptionOffset = 0x01C0;
-                            break;
-                        default:
-                            break;
-                    }
-                    var buffer = reader.ReadBytes((int)reader.BaseStream.Length); // read less
-                    var pos = reader.BaseStream.Position;
+                    var offset = 0x94;
+                    var buffer = reader.ReadBytes((int)reader.BaseStream.Length);
 
                     var outputLine = new List<string>();
 
                     var s = "";
-                    // pass 2, find unicode strings
-                    var i = 0;
+                    var i = 0x94;
                     while (true)
                     {
-                        var b = buffer[i + descriptionOffset];
-                        if (b == 0)
+                        if (buffer[i] == 0 && buffer[i + 1] == 0)
                         {
-                            output = s;
-                            goto lbDone;
-                        }
-
-                        if (b < 0x1F || b > 0x7E)
-                        {
+                            mapname = s;
                             i++;
                             i++;
-                            goto lol;
+                            goto gotMapName;
                         }
 
-                        s = $"{s}{(char)b}";
+                        s = $"{s}{(char)buffer[i + 1]}";
+
                         i++;
                         i++;
 
-                        if (i == descriptionLength + descriptionOffset)
-                        {
-                            output = s;
-                            goto lbDone;
-                        }
+                        // if (b < 0x1F || b > 0x7E)
+                        // {
+                        //     i++;
+                        //     i++;
+                        //     goto skip;
+                        // }
 
-                    lol:
-                        ;
                     }
+
+                gotMapName:
+                    s = "";
+                    while (true)
+                    {
+                        if (buffer[i] == 0 && buffer[i + 1] == 0)
+                        {
+                            mapDescription = s;
+                            output = mapDescription;
+                            s = "";
+                            goto lbDone;
+                        }
+
+                        s = $"{s}{(char)buffer[i]}";
+
+                        i++;
+
+                        // if (b < 0x1F || b > 0x7E)
+                        // {
+                        //     i++;
+                        //     i++;
+                        //     goto skip;
+                        // }
+
+                    }
+
                 }
 
             lbDone:
@@ -426,6 +485,179 @@ namespace MCCHostTool
                 return output;
             }
 
+        }
+        public string readHRmvar(string filepath)
+        {
+            string output = "";
+            string mapname = "";
+            string mapDescription = "";
+            var mapnameOffset = 0xC0;
+            var descriptionOffset = 0x1C0;
+            try
+            {
+                using (var reader = new BinaryReader(File.OpenRead(filepath)))
+                {
+                    var buffer = reader.ReadBytes((int)reader.BaseStream.Length);
+
+                    var outputLine = new List<string>();
+
+                    var s = "";
+                    var i = mapnameOffset;
+                    while (true)
+                    {
+                        if (buffer[i] == 0 && buffer[i + 1] == 0)
+                        {
+                            mapname = s;
+                            i++;
+                            i++;
+                            goto gotMapName;
+                        }
+
+                        s = $"{s}{(char)buffer[i]}";
+
+                        i++;
+                        i++;
+
+                        // if (b < 0x1F || b > 0x7E)
+                        // {
+                        //     i++;
+                        //     i++;
+                        //     goto skip;
+                        // }
+
+                    }
+
+                gotMapName:
+                    s = "";
+                    i = descriptionOffset;
+                    while (true)
+                    {
+                        if (buffer[i] == 0 && buffer[i+1] == 0)
+                        {
+                            mapDescription = s;
+                            output = mapDescription;
+                            s = "";
+                            goto lbDone;
+                        }
+
+                        s = $"{s}{(char)buffer[i]}";
+
+                        i++;
+                        i++;
+
+                        // if (b < 0x1F || b > 0x7E)
+                        // {
+                        //     i++;
+                        //     i++;
+                        //     goto skip;
+                        // }
+
+                    }
+
+                }
+
+            lbDone:
+
+                return mapDescription;
+            }
+            catch (Exception e)
+            {
+                clog(e.Message);
+                return "";
+            }
+
+        }
+        public string readH3gameVar(string filepath)
+        {
+            var mapNameOffset = 0x48;
+            var mapDescriptionOffset = 0x68;
+            string output = "";
+            string mapname = "";
+            string mapDescription = "";
+            try
+            {
+                using (var reader = new BinaryReader(File.OpenRead(filepath)))
+                {
+                    var buffer = reader.ReadBytes((int)reader.BaseStream.Length);
+
+                    var outputLine = new List<string>();
+
+                    var s = "";
+                    var i = mapNameOffset;
+                    while (true)
+                    {
+                        if (buffer[i] == 0 && buffer[i+1] == 0)
+                        {
+                            mapname = s;
+                            i++;
+                            i++;
+                            goto gotMapName;
+                        }
+
+                        s = $"{s}{(char)buffer[i+1]}";
+                        
+                        i++;
+                        i++;
+
+                        // if (b < 0x1F || b > 0x7E)
+                        // {
+                        //     i++;
+                        //     i++;
+                        //     goto skip;
+                        // }
+
+                    }
+
+                gotMapName:
+                    s = "";
+                    i = mapDescriptionOffset;
+                    while (true)
+                    {
+                        if ((buffer[i] == 0 && buffer[i + 1] == 0) || i > mapNameOffset + 0x80)
+                        {
+                            mapDescription = s;
+                            output = mapDescription;
+                            s = "";
+                            goto lbDone;
+                        }
+
+                        s = $"{s}{(char)buffer[i]}";
+
+                        i++;
+
+                        // if (b < 0x1F || b > 0x7E)
+                        // {
+                        //     i++;
+                        //     i++;
+                        //     goto skip;
+                        // }
+
+                    }
+
+                }
+
+            lbDone:
+
+                return output;
+            }
+            catch (Exception e)
+            {
+                clog(e.Message);
+                return output;
+            }
+
+        }
+        public string readVariantFile(string filepath)
+        {
+            string output = "";
+
+            try
+            {
+                output = LoadMapInfo(filepath);
+            }
+            catch (Exception ex) { }
+
+            return output;
         }
         private void ComboBox1_OverrideGameVariant_changed()
         {
@@ -544,9 +776,9 @@ namespace MCCHostTool
 
                 name__________ = row.Cells[(int)cell.gameTitle_____].Value.ToString();
                 map_variant___ = row.Cells[(int)cell.map_variant___].Value.ToString();
-                map_variant_de = row.Cells[(int)cell.map_variant_de].Value.ToString();
+                // map_variant_de = row.Cells[(int)cell.map_variant_de].Value.ToString();
                 game_variant__ = row.Cells[(int)cell.game_variant__].Value.ToString();
-                game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
+                // game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
                 enabled_______ = row.Cells[(int)cell.enabled_______].Value.ToString();
                 playerCount___ = row.Cells[(int)cell.playerCount___].Value.ToString();
                 comment_______ = row.Cells[(int)cell.comment_______].Value.ToString();
@@ -631,6 +863,7 @@ namespace MCCHostTool
                 }
                 else if (enabled == "1")
                 {
+                    clog($"moveStuf: enabled: File.Move({path2}, {path1})");
                     // move map variants
                     if (File.Exists(path2))
                     {
@@ -687,5 +920,177 @@ namespace MCCHostTool
         {
             gameTitle = comboBox2.SelectedItem as string;
         }
+
+        [Flags]
+        public enum LevelFlags
+        {
+            None = 0,
+            Unknown0 = 1 << 0,
+            Unknown1 = 1 << 1,
+            Visible = 1 << 2,
+            GeneratesFilm = 1 << 3,
+            IsMainMenu = 1 << 4,
+            IsCampaign = 1 << 5,
+            IsMultiplayer = 1 << 6,
+            IsDLC = 1 << 7,
+            Unknown8 = 1 << 8,
+            Unknown9 = 1 << 9,
+            IsFirefight = 1 << 10,
+            IsCinematic = 1 << 11,
+            IsForgeOnly = 1 << 12,
+            Unknown13 = 1 << 13,
+            Unknown14 = 1 << 14,
+            Unknown15 = 1 << 15,
+        }
+
+        private MaplevlInfo _mapInformation;
+        private BinaryReader _stream;
+        private const int MapNamesOffset = 0x44;
+        private int _mapDescriptionsOffset;
+        private int _physicalNameOffset;
+        private int _internalNameOffset;
+        private int _mapIndexOffset;
+        private int _maxTeamsOffset;
+        private int _mpObjectsOffset;
+        private int _insertionOffset;
+        private int _defaultAuthorOffset;
+
+        private void UpdateOffsets()
+        {
+            _mapDescriptionsOffset = (1 * 0x40) + MapNamesOffset;
+            _physicalNameOffset = (1 * 0x100) + _mapDescriptionsOffset;
+            _internalNameOffset = _physicalNameOffset + 0x100;
+            _mapIndexOffset = _internalNameOffset + 0x100;
+            _maxTeamsOffset = _mapIndexOffset + 0xA;
+            _mpObjectsOffset = _mapIndexOffset + 0x14;
+            // _insertionOffset = Engine.MultiplayerObjectCollection != null ? _mapIndexOffset + 0x114 : _mapIndexOffset + 0x1C; 
+            _insertionOffset = _mapIndexOffset + 0x114;
+            _defaultAuthorOffset = _insertionOffset + (1 * 0);
+        }
+
+
+        #region Loading Code
+
+        public string LoadMapInfo(string filepath)
+        {
+            _stream = new BinaryReader(File.OpenRead(filepath));
+
+            _mapInformation = new MaplevlInfo();
+
+            // Find out which engine the file uses
+            _stream.BaseStream.Position = (0x34);
+            var size = _stream.ReadInt32();
+            _stream.BaseStream.Position = (0x38);
+            var version = _stream.ReadUInt16();
+
+            // Update offsets based on engine info
+            UpdateOffsets();
+
+            // Load Map ID
+            _stream.BaseStream.Position = (0x3C);
+            _mapInformation.MapID = _stream.ReadInt32();
+
+            // Load Flags
+            _stream.BaseStream.Position = (0x42);
+            _mapInformation.Flags = (LevelFlags)_stream.ReadInt16();
+
+            // Load Map Names and Descriptions
+            LoadMapNames(MapNamesOffset);
+            LoadMapDescriptions(_mapDescriptionsOffset);
+
+            // Load Map Physical Name
+            var a = _stream.ReadChars(0x64);
+            var b = "";
+            foreach (var c in a)
+                b = $"{b}{c}";
+
+            _stream.BaseStream.Position = (_physicalNameOffset);
+            _mapInformation.PhysicalName = b; // WHAT SIZE
+
+            // Load Map Internal Name
+            var a1 = _stream.ReadChars(0x64);
+            var b1 = "";
+            foreach (var c1 in a1)
+                b1 = $"{b1}{c1}";
+            _stream.BaseStream.Position = (_internalNameOffset);
+            _mapInformation.InternalName = b1; // WHAT SIZE
+
+            // Load Map Index
+            _stream.BaseStream.Position = (_mapIndexOffset);
+            _mapInformation.MapIndex = _stream.ReadInt32();
+
+            // Load Max Teams ?
+            // if (Engine.MaxTeamCollection != null)
+            //     LoadMapMaxTeams(_maxTeamsOffset);
+
+            // Load Multiplayer Object Table
+            // if (Engine.MultiplayerObjectCollection != null)
+            //     LoadMPObjectTable(_mpObjectsOffset);
+
+            // Load Insertion Points
+            LoadInsertionPoints(_insertionOffset);
+
+            // Load Default Author Name
+            // might fail because the previous 3 got disabled
+            _stream.BaseStream.Position = (_defaultAuthorOffset);
+            _mapInformation.DefaultAuthor = _stream.ReadChars(0x64).ToString(); // WHAT SIZE
+
+            return _mapInformation.PhysicalName;
+        }
+
+        private void LoadMapNames(int baseOffset)
+        {
+            _mapInformation.MapNames.Clear();
+
+            for (int i = 0; i < 1; i++) // language count
+            {
+                _stream.BaseStream.Position = (baseOffset + (i * 0x40));
+                _mapInformation.MapNames.Add(_stream.ReadChars(0x64).ToString()); // WHAT SIZE
+            }
+        }
+
+        private void LoadMapDescriptions(int baseOffset)
+        {
+            _mapInformation.MapDescriptions.Clear();
+
+            for (int i = 0; i < 1; i++) // lg
+            {
+                _stream.BaseStream.Position = (baseOffset + (i * 0x100));
+                _mapInformation.MapDescriptions.Add(_stream.ReadChars(0x64).ToString()); // WHAT SIZE
+            }
+        }
+
+        private void LoadInsertionPoints(int baseOffset)
+        {
+            _mapInformation.MapCheckpoints.Clear();
+        }
+
+        #endregion
+
+        public class MaplevlInfo
+        {
+            public int MapID { get; set; }
+            public LevelFlags Flags { get; set; }
+            public IList<string> MapNames = new List<string>();
+            public IList<string> MapDescriptions = new List<string>();
+            public string InternalName { get; set; }
+            public string PhysicalName { get; set; }
+            public int MapIndex { get; set; }
+            public IList<byte> MaxTeamCounts = new List<byte>();
+            public BitArray ObjectTable { get; set; }
+            public IList<Checkpoint> MapCheckpoints = new List<Checkpoint>();
+            public string DefaultAuthor { get; set; }
+        }
+
+        public class Checkpoint
+        {
+            public bool IsVisible { get; set; }
+            public bool IsUsed { get; set; }
+            public byte ZoneIndex { get; set; }
+            public string ZoneName { get; set; }
+            public IList<string> CheckpointNames = new List<string>();
+            public IList<string> CheckpointDescriptions = new List<string>();
+        }
+
     }
 }
