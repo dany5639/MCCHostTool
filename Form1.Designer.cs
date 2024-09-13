@@ -63,7 +63,6 @@
             button1.Size = new Size(100, 23);
             button1.TabIndex = 0;
             button1.Text = "Move Files";
-            button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click_moveFiles;
             // 
             // button2
@@ -74,7 +73,6 @@
             button2.Size = new Size(100, 23);
             button2.TabIndex = 1;
             button2.Text = "Clear previous";
-            button2.UseVisualStyleBackColor = true;
             // 
             // textBox1
             // 
@@ -84,6 +82,7 @@
             textBox1.Size = new Size(944, 23);
             textBox1.TabIndex = 2;
             textBox1.Text = "E:\\_DLD_Large\\Games\\DigitalRetail\\SteamLibrary\\steamapps\\common\\Halo The Master Chief Collection\\";
+            textBox1.TextChanged += textBox1_TextChanged;
             // 
             // statusStrip1
             // 
@@ -166,7 +165,6 @@
             button3.Size = new Size(100, 23);
             button3.TabIndex = 10;
             button3.Text = "Locate MCC";
-            button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click_locateMCC;
             // 
             // richTextBox1
@@ -186,6 +184,7 @@
             comboBox1_gameVariantOverrides.Name = "comboBox1_gameVariantOverrides";
             comboBox1_gameVariantOverrides.Size = new Size(635, 23);
             comboBox1_gameVariantOverrides.TabIndex = 12;
+            comboBox1_gameVariantOverrides.SelectedIndexChanged += comboBox1_gameVariantOverrides_SelectedIndexChanged;
             comboBox1_gameVariantOverrides.SelectedValueChanged += comboBox1_gameVariantOverrides_SelectedValueChanged;
             // 
             // label1
@@ -205,6 +204,7 @@
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(151, 23);
             comboBox2.TabIndex = 14;
+            comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
             comboBox2.SelectedValueChanged += comboBox2_SelectedValueChanged;
             // 
             // label2

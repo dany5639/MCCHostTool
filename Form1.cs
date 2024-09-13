@@ -144,6 +144,8 @@ namespace MCCHostTool
             dataGridView1.Columns[(int)cell.playerCount___].Width = 90;
             dataGridView1.Columns[(int)cell.comment_______].Width = 90;
             dataGridView1.Columns[(int)cell.quality_______].Width = 90;
+
+            ApplyColors();
         }
         private void button3_Click_locateMCC(object sender, EventArgs e)
         {
@@ -192,6 +194,9 @@ namespace MCCHostTool
             int i = -1;
             foreach (var a in mapVariantsCollection)
             {
+                if (a.Value.gameTitle_____ != gameTitle)
+                    continue;
+
                 i++;
                 dataGridView1.Rows.Add(a.Key);
                 dataGridView1.Rows[i].Cells[(int)cell.gameTitle_____].Value = a.Value.gameTitle_____;
@@ -205,6 +210,7 @@ namespace MCCHostTool
                 dataGridView1.Rows[i].Cells[(int)cell.quality_______].Value = a.Value.quality_______;
 
             }
+      
         }
         private void readItemsList()
         {
@@ -380,7 +386,7 @@ namespace MCCHostTool
 
             switch (variantsFolder)
             {
-                case "game_variants": 
+                case "game_variants":
                 case "game_variants_library":
                     fillComboboxWithGameVariantOverrides();
                     goto done3;
@@ -532,7 +538,7 @@ namespace MCCHostTool
                     i = descriptionOffset;
                     while (true)
                     {
-                        if (buffer[i] == 0 && buffer[i+1] == 0)
+                        if (buffer[i] == 0 && buffer[i + 1] == 0)
                         {
                             mapDescription = s;
                             output = mapDescription;
@@ -586,7 +592,7 @@ namespace MCCHostTool
                     var i = mapNameOffset;
                     while (true)
                     {
-                        if (buffer[i] == 0 && buffer[i+1] == 0)
+                        if (buffer[i] == 0 && buffer[i + 1] == 0)
                         {
                             mapname = s;
                             i++;
@@ -594,8 +600,8 @@ namespace MCCHostTool
                             goto gotMapName;
                         }
 
-                        s = $"{s}{(char)buffer[i+1]}";
-                        
+                        s = $"{s}{(char)buffer[i + 1]}";
+
                         i++;
                         i++;
 
@@ -823,6 +829,8 @@ namespace MCCHostTool
                 var path3 = $"{rootPath}\\{gameTitle}\\game_variants\\{game_variant__}";
                 var path4 = $"{rootPath}\\{gameTitle}\\game_variants_library\\{game_variant__}";
 
+                // current problem: won't move game variants back if they are not used by any map
+
                 var enabled = a.Value.enabled_______;
 
                 if (enabled == "0")
@@ -833,7 +841,14 @@ namespace MCCHostTool
                         if (!File.Exists(path2))
                         {
                             // clog($"moveStuf: File.Move({path1}, {path2})");
-                            File.Move(path1, path2);
+                            try
+                            {
+                                File.Move(path1, path2);
+                            }
+                            catch (Exception ex)
+                            {
+                                clog($"moveStuf: File.Move({path1}, {path2}) exceptio: {ex.Message}");
+                            }
                         }
                         else
                         {
@@ -842,16 +857,20 @@ namespace MCCHostTool
                         }
                     }
 
-                    path1 = path3;
-                    path2 = path4;
-
                     // move map game_variants
                     if (File.Exists(path3))
                     {
                         if (!File.Exists(path4))
                         {
                             // clog($"moveStuf: File.Move({path3}, {path4})");
-                            File.Move(path3, path4);
+                            try
+                            {
+                                File.Move(path3, path4);
+                            }
+                            catch (Exception ex)
+                            {
+                                clog($"moveStuf: File.Move({path3}, {path4}) exceptio: {ex.Message}");
+                            }
                         }
                         else
                         {
@@ -870,7 +889,14 @@ namespace MCCHostTool
                         if (!File.Exists(path1))
                         {
                             // clog($"moveStuf: File.Move({path2}, {path1})");
-                            File.Move(path2, path1);
+                            try
+                            {
+                                File.Move(path2, path1);
+                            }
+                            catch (Exception ex)
+                            {
+                                clog($"moveStuf: File.Move({path2}, {path1}) exceptio: {ex.Message}");
+                            }
                         }
                         else
                         {
@@ -889,7 +915,14 @@ namespace MCCHostTool
                         if (!File.Exists(path3))
                         {
                             // clog($"moveStuf: File.Move({path4}, {path3})");
-                            File.Move(path4, path3);
+                            try
+                            {
+                                File.Move(path4, path3);
+                            }
+                            catch (Exception ex)
+                            {
+                                clog($"moveStuf: File.Move({path4}, {path3}) exceptio: {ex.Message}");
+                            }
                         }
                         else
                         {
@@ -1092,5 +1125,37 @@ namespace MCCHostTool
             public IList<string> CheckpointDescriptions = new List<string>();
         }
 
+        public void ApplyColors()
+        {
+            var BackColor = Color.White;
+            var ForeColor = Color.Black;
+            this.BackColor = BackColor;
+            this.ForeColor = ForeColor;
+            // zcomboBox1_gameVariantOverrides.BackColor = BackColor;
+            // zcomboBox1_gameVariantOverrides.ForeColor = ForeColor;
+            // zcomboBox2.BackColor = BackColor;
+            // zcomboBox2.ForeColor = ForeColor;
+            // ztextBox1.BackColor = BackColor;
+            // ztextBox1.ForeColor = ForeColor;
+            // ztextBox2.BackColor = BackColor;
+            // ztextBox2.ForeColor = ForeColor;
+            // zdataGridView1.ForeColor = BackColor;
+            // zdataGridView1.BackColor = ForeColor;
+        }
+
+        private void comboBox1_gameVariantOverrides_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
