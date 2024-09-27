@@ -358,10 +358,22 @@ namespace MCCHostTool
                     switch (gameTitle)
                     {
                         case "halo3":
-                            variantDescription = $"{readH3Hexpat($"{absoluteVariantsPath}\\{variant}")}";
+                            try
+                            {
+                                variantDescription = $"{readH3Hexpat($"{absoluteVariantsPath}\\{variant}")}";
+                            }
+                            catch
+                            {
+                            }
                             break;
                         case "haloreach":
-                            variantDescription = $"{readReachHexpat($"{absoluteVariantsPath}\\{variant}")}";
+                            try
+                            {
+                                variantDescription = $"{readReachHexpat($"{absoluteVariantsPath}\\{variant}")}";
+                            }
+                            catch
+                            {
+                            }
                             break;
                         default:
                             throw new Exception();
@@ -420,7 +432,7 @@ namespace MCCHostTool
 
             comboBox1_gameVariantOverrides.Items.Clear();
             foreach (var a in gameVariantsCollection)
-                comboBox1_gameVariantOverrides.Items.Add($"{a.Key}: {a.Value.game_var_descr}");
+                comboBox1_gameVariantOverrides.Items.Add($"{a.Value.gameTitle_____} {a.Key}: {a.Value.game_var_descr}");
 
         }
         private void ComboBox1_OverrideGameVariant_changed()
@@ -444,7 +456,7 @@ namespace MCCHostTool
             int hits = 0;
             foreach (var f in gameVariantsCollection)
             {
-                if (gamevariantOverride.StartsWith(f.Key))
+                if (gamevariantOverride.Contains(f.Key))
                 {
                     hits++;
                     newGameVariant = f.Value;
@@ -600,9 +612,19 @@ namespace MCCHostTool
         }
         private void button1_Click_moveFiles(object sender, EventArgs e)
         {
+
             // dirty, just move all files back to library folders
             foreach (var gameTitle in MCCtitles)
             {
+                switch (gameTitle)
+                {
+                    case "halo3":
+                    case "haloreach":
+                        break;
+                    default: // ignore titles other than halo3 and haloreach
+                        continue;
+                }
+
                 var items11 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\map_variants");
                 var items12 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\map_variants_library");
                 var items21 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\game_variants");
@@ -611,12 +633,12 @@ namespace MCCHostTool
                 foreach (var item in items11)
                 {
                     clog($"TEMPDEBUG: button1_Click_moveFiles.File.Move({items11}\\{item}\", \"{items12}\\{item}\")");
-                    // File.Move($"{items11}\\{item}", $"{items12}\\{item}");
+                    File.Move($"{items11}\\{item}", $"{items12}\\{item}");
                 }
                 foreach (var item in items21)
                 {
                     clog($"TEMPDEBUG: button1_Click_moveFiles.File.Move({items21}\\{item}\", \"{items22}\\{item}\")");
-                    // File.Move($"{items21}\\{item}", $"{items22}\\{item}");
+                    File.Move($"{items21}\\{item}", $"{items22}\\{item}");
                 }
 
                 foreach (var a in mapVariantsCollection)
@@ -637,7 +659,7 @@ namespace MCCHostTool
                     try
                     {
                         clog($"TEMPDEBUG: button1_Click_moveFiles: File.Move({path2}, {path1})");
-                        // File.Move(path2, path1);
+                        File.Move(path2, path1);
                     }
                     catch (Exception ex)
                     {
@@ -647,7 +669,7 @@ namespace MCCHostTool
                     try
                     {
                         clog($"button1_Click_moveFiles: File.Move({path4}, {path3})");
-                        // File.Move(path4, path3);
+                        File.Move(path4, path3);
                     }
                     catch (Exception ex)
                     {
@@ -714,23 +736,30 @@ namespace MCCHostTool
                     pos = pos + chunk_size;
                     goto start;
                 case "mvar":
-                    _stream.BaseStream.Position += 8;
-                    array = new List<char>();
-                    while (true)
+                    try
                     {
-                        a = _stream.ReadInt16();
-                        if (a == 0x0)
-                            goto stringdone;
-                        array.Add((char)a);
+                        _stream.BaseStream.Position += 8;
+                        array = new List<char>();
+                        while (true)
+                        {
+                            a = _stream.ReadInt16();
+                            if (a == 0x0)
+                                goto stringdone;
+                            array.Add((char)a);
 
+                        }
+                    stringdone:
+                        // string str = System.Text.Encoding.Unicode.GetString(array.ToArray());
+                        internalName = new string(array.ToArray());
+
+                        description = new string(_stream.ReadChars(0x80));
+                        // description = "";
+
+                        return description;
                     }
-                stringdone:
-                    // string str = System.Text.Encoding.Unicode.GetString(array.ToArray());
-                    internalName = new string(array.ToArray());
-
-                    description = new string(_stream.ReadChars(0x80));
-
-                    return description;
+                    catch
+                    { return ""; }
+                    
                 case "_eof":
                     goto end;
                 case "mpvr": // offset is wrong
@@ -771,19 +800,20 @@ namespace MCCHostTool
                     goto start;
                 case "chdr":
                     pos = pos + chunk_size;
-                    // 0x90
+                    // just jump to description
                     _stream.BaseStream.Position += 0x190 - 0x4*3;
-                    var array = new List<byte>();
+                    var array = new List<char>();
                     while (true)
                     {
                         a = _stream.ReadInt16();
-                        array.Add((byte)a);
+                        array.Add((char)(a/0x100));
                         if (a == 0x0)
                             goto stringdone2;
 
                     }
                 stringdone2:
-                    var str = System.Text.Encoding.Unicode.GetString(array.ToArray());
+                    // var str = System.Text.Encoding.Unicode.GetString(array.ToArray());
+                    var str = new string(array.ToArray());
 
                     return str;
                 case "athr":
@@ -791,20 +821,21 @@ namespace MCCHostTool
                     goto start;
                 case "mvar":
                     _stream.BaseStream.Position += 8;
-                    array = new List<byte>();
+                    array = new List<char>();
                     while (true)
                     {
                         a = _stream.ReadInt16();
-                        array.Add((byte)a);
+                        array.Add((char)(a/0x100));
                         if (a == 0x0)
                             goto stringdone;
 
                     }
                 stringdone:
-                    str = System.Text.Encoding.Unicode.GetString(array.ToArray());
-                    var description = _stream.ReadChars(0x80).ToString();
+                    // str = System.Text.Encoding.Unicode.GetString(array.ToArray());
+                    // var description = _stream.ReadChars(0x80).ToString();
 
-                    return description;
+                    str = new string(array.ToArray());
+                    return str;
                 case "_eof":
                     goto end;
                 case "mpvr": // offset is wrong
