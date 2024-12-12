@@ -34,12 +34,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             dataGridView1 = new DataGridView();
-            button3 = new Button();
-            folderBrowserDialog1 = new FolderBrowserDialog();
-            richTextBox1 = new RichTextBox();
-            comboBox1_gameVariantOverrides = new ComboBox();
-            label1 = new Label();
-            textBox2 = new TextBox();
             Column1 = new DataGridViewTextBoxColumn();
             Column2 = new DataGridViewTextBoxColumn();
             Column3 = new DataGridViewTextBoxColumn();
@@ -51,6 +45,13 @@
             Column5 = new DataGridViewTextBoxColumn();
             Column9 = new DataGridViewTextBoxColumn();
             Column10 = new DataGridViewTextBoxColumn();
+            button3 = new Button();
+            folderBrowserDialog1 = new FolderBrowserDialog();
+            richTextBox1 = new RichTextBox();
+            comboBox1_gameVariantOverrides = new ComboBox();
+            label1 = new Label();
+            textBox2 = new TextBox();
+            button4 = new Button();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -111,53 +112,6 @@
             dataGridView1.TabIndex = 9;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
             // 
-            // button3
-            // 
-            button3.Location = new Point(12, 11);
-            button3.Name = "button3";
-            button3.Size = new Size(100, 23);
-            button3.TabIndex = 10;
-            button3.Text = "Locate MCC";
-            button3.Click += button3_Click_locateMCC;
-            // 
-            // richTextBox1
-            // 
-            richTextBox1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            richTextBox1.Location = new Point(12, 76);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1382, 506);
-            richTextBox1.TabIndex = 11;
-            richTextBox1.Text = "";
-            // 
-            // comboBox1_gameVariantOverrides
-            // 
-            comboBox1_gameVariantOverrides.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            comboBox1_gameVariantOverrides.FormattingEnabled = true;
-            comboBox1_gameVariantOverrides.Location = new Point(324, 584);
-            comboBox1_gameVariantOverrides.Name = "comboBox1_gameVariantOverrides";
-            comboBox1_gameVariantOverrides.Size = new Size(967, 23);
-            comboBox1_gameVariantOverrides.TabIndex = 12;
-            comboBox1_gameVariantOverrides.SelectedValueChanged += comboBox1_gameVariantOverrides_SelectedValueChanged;
-            // 
-            // label1
-            // 
-            label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label1.AutoSize = true;
-            label1.Location = new Point(224, 592);
-            label1.Name = "label1";
-            label1.Size = new Size(94, 15);
-            label1.TabIndex = 13;
-            label1.Text = "Override variant:";
-            // 
-            // textBox2
-            // 
-            textBox2.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            textBox2.Location = new Point(1297, 584);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(97, 23);
-            textBox2.TabIndex = 16;
-            textBox2.TextChanged += textBox2_TextChanged_overrideFilter;
-            // 
             // Column1
             // 
             Column1.HeaderText = "Name";
@@ -213,6 +167,63 @@
             Column10.HeaderText = "Game description";
             Column10.Name = "Column10";
             // 
+            // button3
+            // 
+            button3.Location = new Point(12, 11);
+            button3.Name = "button3";
+            button3.Size = new Size(100, 23);
+            button3.TabIndex = 10;
+            button3.Text = "Locate MCC";
+            button3.Click += button3_Click_locateMCC;
+            // 
+            // richTextBox1
+            // 
+            richTextBox1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            richTextBox1.Location = new Point(12, 76);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.Size = new Size(1382, 506);
+            richTextBox1.TabIndex = 11;
+            richTextBox1.Text = "";
+            // 
+            // comboBox1_gameVariantOverrides
+            // 
+            comboBox1_gameVariantOverrides.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            comboBox1_gameVariantOverrides.FormattingEnabled = true;
+            comboBox1_gameVariantOverrides.Location = new Point(430, 584);
+            comboBox1_gameVariantOverrides.Name = "comboBox1_gameVariantOverrides";
+            comboBox1_gameVariantOverrides.Size = new Size(861, 23);
+            comboBox1_gameVariantOverrides.TabIndex = 12;
+            comboBox1_gameVariantOverrides.SelectedValueChanged += comboBox1_gameVariantOverrides_SelectedValueChanged;
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label1.AutoSize = true;
+            label1.Location = new Point(330, 592);
+            label1.Name = "label1";
+            label1.Size = new Size(94, 15);
+            label1.TabIndex = 13;
+            label1.Text = "Override variant:";
+            // 
+            // textBox2
+            // 
+            textBox2.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            textBox2.Location = new Point(1297, 584);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(97, 23);
+            textBox2.TabIndex = 16;
+            textBox2.TextChanged += textBox2_TextChanged_overrideFilter;
+            // 
+            // button4
+            // 
+            button4.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            button4.Location = new Point(224, 588);
+            button4.Name = "button4";
+            button4.Size = new Size(100, 23);
+            button4.TabIndex = 1;
+            button4.Text = "Dump ";
+            button4.Click += button4_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -225,6 +236,7 @@
             Controls.Add(dataGridView1);
             Controls.Add(statusStrip1);
             Controls.Add(textBox1);
+            Controls.Add(button4);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(richTextBox1);
@@ -262,5 +274,6 @@
         private DataGridViewTextBoxColumn Column5;
         private DataGridViewTextBoxColumn Column9;
         private DataGridViewTextBoxColumn Column10;
+        private Button button4;
     }
 }

@@ -108,13 +108,13 @@ namespace MCCHostTool
 
         private enum cell
         {
-            gameTitle_____, 
-            map_variant___, 
-            game_variant__, 
-            enabled_______, 
-            comment_______, 
-            quality_______, 
-            map___________, 
+            gameTitle_____,
+            map_variant___,
+            game_variant__,
+            enabled_______,
+            comment_______,
+            quality_______,
+            map___________,
             gameMode______,
             playerCount___,
             map_variant_de,
@@ -317,12 +317,12 @@ namespace MCCHostTool
 
                 }
 
-                absoluteVariantsPath = $"{rootPath}{gameTitle}\\{variantsFolder}";
+                absoluteVariantsPath = $"{rootPath}\\{gameTitle}\\{variantsFolder}";
 
                 if (!Directory.Exists(absoluteVariantsPath))
                 {
                     throw new Exception($"WARNING: missing {variantsFolder} folder: {absoluteVariantsPath}");
-                       
+
                     // toolStripStatusLabel1.Text = $"WARNING: missing {variantsFolder} folder: {absoluteVariantsPath}.";
                     // return;
                 }
@@ -592,8 +592,8 @@ namespace MCCHostTool
                     $"{gameMode______};" +
                     $"{playerCount___};" +
                     "";
-                    // $"{map_variant_de};" +
-                    // $"{game_variant_d}";
+                // $"{map_variant_de};" +
+                // $"{game_variant_d}";
 
                 output.Add(outputline);
                 // $"{description}";
@@ -739,7 +739,7 @@ namespace MCCHostTool
                     goto start;
                 case "chdr":
                     pos = pos + chunk_size;
-                    _stream.BaseStream.Position += 0x4*3;
+                    _stream.BaseStream.Position += 0x4 * 3;
                     var array = new List<char>();
                     while (true)
                     {
@@ -783,7 +783,7 @@ namespace MCCHostTool
                     }
                     catch
                     { return ""; }
-                    
+
                 case "_eof":
                     goto end;
                 case "mpvr": // offset is wrong
@@ -792,7 +792,7 @@ namespace MCCHostTool
                     goto end;
             }
 
-            end:
+        end:
             return "";
         }
         public string readReachHexpat(string filepath)
@@ -825,12 +825,12 @@ namespace MCCHostTool
                 case "chdr":
                     pos = pos + chunk_size;
                     // just jump to description
-                    _stream.BaseStream.Position += 0x190 - 0x4*3;
+                    _stream.BaseStream.Position += 0x190 - 0x4 * 3;
                     var array = new List<char>();
                     while (true)
                     {
                         a = _stream.ReadInt16();
-                        array.Add((char)(a/0x100));
+                        array.Add((char)(a / 0x100));
                         if (a == 0x0)
                             goto stringdone2;
 
@@ -849,7 +849,7 @@ namespace MCCHostTool
                     while (true)
                     {
                         a = _stream.ReadInt16();
-                        array.Add((char)(a/0x100));
+                        array.Add((char)(a / 0x100));
                         if (a == 0x0)
                             goto stringdone;
 
@@ -868,7 +868,7 @@ namespace MCCHostTool
                     goto end;
             }
 
-            end:
+        end:
             return "";
         }
 
@@ -906,5 +906,9 @@ namespace MCCHostTool
 
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
