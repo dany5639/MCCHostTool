@@ -23,6 +23,7 @@ namespace MCCHostTool
     public partial class Form1 : Form
     {
         private static string logFile = $"{Directory.GetParent(Environment.ProcessPath)}\\MCCHostTool_settings.csv";
+        private static string logFile2 = $"{Directory.GetParent(Environment.ProcessPath)}\\MCCHostTool_spreadsheet.csv";
         private Dictionary<string, item> mapVariantsCollection;
         private Dictionary<string, item> gameVariantsCollection;
         public List<string> gameVariantOverrides_list = new List<string>();
@@ -628,10 +629,10 @@ namespace MCCHostTool
                         continue;
                 }
 
-                var items11 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\map_variants");
-                var items12 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\map_variants_library");
-                var items21 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\game_variants");
-                var items22 = Directory.EnumerateFiles($"{rootPath}{gameTitle}\\game_variants_library");
+                var items11 = Directory.EnumerateFiles($"{rootPath}\\{gameTitle}\\map_variants");
+                var items12 = Directory.EnumerateFiles($"{rootPath}\\{gameTitle}\\map_variants_library");
+                var items21 = Directory.EnumerateFiles($"{rootPath}\\{gameTitle}\\game_variants");
+                var items22 = Directory.EnumerateFiles($"{rootPath}\\{gameTitle}\\game_variants_library");
 
                 foreach (var item in items11)
                 {
@@ -670,10 +671,10 @@ namespace MCCHostTool
                     var map_variant___ = a.Value.map_variant___;
                     var game_variant__ = a.Value.game_variant__;
 
-                    var path1 = $"{rootPath}{gameTitle}\\map_variants\\{map_variant___}";
-                    var path2 = $"{rootPath}{gameTitle}\\map_variants_library\\{map_variant___}";
-                    var path3 = $"{rootPath}{gameTitle}\\game_variants\\{game_variant__}";
-                    var path4 = $"{rootPath}{gameTitle}\\game_variants_library\\{game_variant__}";
+                    var path1 = $"{rootPath}\\{gameTitle}\\map_variants\\{map_variant___}";
+                    var path2 = $"{rootPath}\\{gameTitle}\\map_variants_library\\{map_variant___}";
+                    var path3 = $"{rootPath}\\{gameTitle}\\game_variants\\{game_variant__}";
+                    var path4 = $"{rootPath}\\{gameTitle}\\game_variants_library\\{game_variant__}";
 
                     var enabled = a.Value.enabled_______;
 
@@ -916,9 +917,6 @@ namespace MCCHostTool
             {
                 var row = dataGridView1.Rows[i];
 
-                if (row.Cells[0].Value == null)
-                    continue;
-
                 // don't save descriptions for now, they often contain garbage data;
 
                 string name__________ = "";
@@ -945,6 +943,7 @@ namespace MCCHostTool
                 // if (row.Cells[(int)cell.map_variant_de].Value == null) row.Cells[(int)cell.map_variant_de].Value = "";
                 // if (row.Cells[(int)cell.game_variant_d].Value == null) row.Cells[(int)cell.game_variant_d].Value = "";
 
+
                 name__________ = row.Cells[(int)cell.gameTitle_____].Value.ToString();
                 map_variant___ = row.Cells[(int)cell.map_variant___].Value.ToString();
                 game_variant__ = row.Cells[(int)cell.game_variant__].Value.ToString();
@@ -958,8 +957,8 @@ namespace MCCHostTool
                 // game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
 
                 // i need to learn a compact way to do this
-                if (game_variant__ == "")
-                    continue;
+                // if (game_variant__ == "")
+                //     continue;
 
                 string outputline =
                     $"{name__________};" +
@@ -980,11 +979,12 @@ namespace MCCHostTool
             }
 
             // WriteCsv(output, logFile);
-            clog("TEMPDEBUG");
-            clog($"WriteCsv({output.Count}, {logFile})");
-            foreach (var a in output)
-                clog(a);
-            clog("TEMPDEBUG end WriteCsv");
+            clog("Dump all to a csv for spreadsheets."); ;
+            clog($"Writing to {logFile2}");
+            clog($"WriteCsv({output.Count}, {logFile2})");
+
+            WriteCsv(output, logFile2);
+
         }
     }
 }
