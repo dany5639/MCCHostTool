@@ -346,6 +346,7 @@ namespace MCCHostTool
                 foreach (var variant in variantsList)
                 {
                     var variantDescription = "";
+                    var newVariantDescription = new List<char>();
 
                     switch (gameTitle)
                     {
@@ -353,6 +354,13 @@ namespace MCCHostTool
                             try
                             {
                                 variantDescription = $"{readH3Hexpat($"{absoluteVariantsPath}\\{variant}")}";
+
+                                foreach (var i in variantDescription)
+                                    if ((byte)i > 0x1F && (byte)i < 0x7E && (byte)i != 0x3B)
+                                        newVariantDescription.Add(i);
+
+                                variantDescription = new string(newVariantDescription.ToArray());
+
                             }
                             catch
                             {
@@ -362,6 +370,12 @@ namespace MCCHostTool
                             try
                             {
                                 variantDescription = $"{readReachHexpat($"{absoluteVariantsPath}\\{variant}")}";
+
+                                foreach (var i in variantDescription)
+                                    if ((byte)i > 0x1F && (byte)i < 0x7E && (byte)i != 0x3B)
+                                        newVariantDescription.Add(i);
+
+                                variantDescription = new string(newVariantDescription.ToArray());
                             }
                             catch
                             {
@@ -928,6 +942,8 @@ namespace MCCHostTool
                 string map___________ = "";
                 string gameMode______ = "";
                 string playerCount___ = "";
+                string map_variant_de = "";
+                string game_variant_d = "";
                 // string map_variant_de = "";
                 // string game_variant_d = "";
 
@@ -940,8 +956,8 @@ namespace MCCHostTool
                 if (row.Cells[(int)cell.map___________].Value == null) row.Cells[(int)cell.map___________].Value = "";
                 if (row.Cells[(int)cell.gameMode______].Value == null) row.Cells[(int)cell.gameMode______].Value = "";
                 if (row.Cells[(int)cell.playerCount___].Value == null) row.Cells[(int)cell.playerCount___].Value = "";
-                // if (row.Cells[(int)cell.map_variant_de].Value == null) row.Cells[(int)cell.map_variant_de].Value = "";
-                // if (row.Cells[(int)cell.game_variant_d].Value == null) row.Cells[(int)cell.game_variant_d].Value = "";
+                if (row.Cells[(int)cell.map_variant_de].Value == null) row.Cells[(int)cell.map_variant_de].Value = "";
+                if (row.Cells[(int)cell.game_variant_d].Value == null) row.Cells[(int)cell.game_variant_d].Value = "";
 
 
                 name__________ = row.Cells[(int)cell.gameTitle_____].Value.ToString();
@@ -953,8 +969,8 @@ namespace MCCHostTool
                 map___________ = row.Cells[(int)cell.map___________].Value.ToString();
                 gameMode______ = row.Cells[(int)cell.gameMode______].Value.ToString();
                 playerCount___ = row.Cells[(int)cell.playerCount___].Value.ToString();
-                // map_variant_de = row.Cells[(int)cell.map_variant_de].Value.ToString();
-                // game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
+                map_variant_de = row.Cells[(int)cell.map_variant_de].Value.ToString();
+                game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
 
                 // i need to learn a compact way to do this
                 // if (game_variant__ == "")
@@ -970,9 +986,9 @@ namespace MCCHostTool
                     $"{map___________};" +
                     $"{gameMode______};" +
                     $"{playerCount___};" +
+                    $"{map_variant_de};" +
+                    $"{game_variant_d}" +
                     "";
-                // $"{map_variant_de};" +
-                // $"{game_variant_d}";
 
                 output.Add(outputline);
                 // $"{description}";
