@@ -120,17 +120,6 @@ namespace MCCHostTool
             map_variant_de,
             game_variant_d,
         }
-        // 0
-        // 1
-        // 2
-        // 3
-        // 4
-        // 5
-        // 6
-        // 7
-        // 8
-        // 9
-        // 10
 
         public List<string> MCCtitles = new List<string> {
             "groundhog",
@@ -314,6 +303,7 @@ namespace MCCHostTool
         {
             foreach (var gameTitle in MCCtitles)
             {
+                // just skip other titles for now
                 switch (gameTitle)
                 {
                     case "halo3":
@@ -322,8 +312,9 @@ namespace MCCHostTool
                     case "haloreach":
                         clog($"readBungieFiles({variantsFolder}).haloreach");
                         break;
-                    default: // ignore titles other than halo3 and haloreach
+                    default:
                         continue;
+
                 }
 
                 absoluteVariantsPath = $"{rootPath}{gameTitle}\\{variantsFolder}";
@@ -376,9 +367,21 @@ namespace MCCHostTool
                             }
                             break;
                         default:
-                            throw new Exception();
+                            continue;
 
                     }
+                    while (true)
+                    {
+                        if (variantDescription.Length == 0)
+                            goto done;
+
+                        if (variantDescription.First() == " ".ToCharArray()[0])
+                            variantDescription = variantDescription.Remove(0);
+
+                        else goto done;
+                    }
+                done:
+                    ;
 
                     var newVariant = new item { gameTitle_____ = $"{gameTitle}" };
 
@@ -633,12 +636,33 @@ namespace MCCHostTool
                 foreach (var item in items11)
                 {
                     clog($"TEMPDEBUG: button1_Click_moveFiles.File.Move({items11}\\{item}\", \"{items12}\\{item}\")");
-                    File.Move($"{items11}\\{item}", $"{items12}\\{item}");
+                    try
+                    {
+
+                        File.Move($"{items11}\\{item}", $"{items12}\\{item}");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clog($"Exception: moveStuf: File.Move({items11}\\{item}, {items12}\\{item}) exception: {ex.Message}");
+
+                    }
                 }
                 foreach (var item in items21)
                 {
                     clog($"TEMPDEBUG: button1_Click_moveFiles.File.Move({items21}\\{item}\", \"{items22}\\{item}\")");
-                    File.Move($"{items21}\\{item}", $"{items22}\\{item}");
+
+                    try
+                    {
+
+                        File.Move($"{items21}\\{item}", $"{items22}\\{item}");
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        clog($"Exception: moveStuf: File.Move({items21}\\{item}, {items22}\\{item}) exception: {ex.Message}");
+                    }
                 }
 
                 foreach (var a in mapVariantsCollection)
