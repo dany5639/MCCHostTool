@@ -908,7 +908,83 @@ namespace MCCHostTool
 
         private void button4_Click(object sender, EventArgs e)
         {
+            // clog($"dumpSettings");
 
+            var output = new List<string>();
+
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                var row = dataGridView1.Rows[i];
+
+                if (row.Cells[0].Value == null)
+                    continue;
+
+                // don't save descriptions for now, they often contain garbage data;
+
+                string name__________ = "";
+                string map_variant___ = "";
+                string game_variant__ = "";
+                string enabled_______ = "";
+                string comment_______ = "";
+                string quality_______ = "";
+                string map___________ = "";
+                string gameMode______ = "";
+                string playerCount___ = "";
+                // string map_variant_de = "";
+                // string game_variant_d = "";
+
+                if (row.Cells[(int)cell.gameTitle_____].Value == null) row.Cells[(int)cell.gameTitle_____].Value = "";
+                if (row.Cells[(int)cell.map_variant___].Value == null) row.Cells[(int)cell.map_variant___].Value = "";
+                if (row.Cells[(int)cell.game_variant__].Value == null) row.Cells[(int)cell.game_variant__].Value = "";
+                if (row.Cells[(int)cell.enabled_______].Value == null) row.Cells[(int)cell.enabled_______].Value = "";
+                if (row.Cells[(int)cell.comment_______].Value == null) row.Cells[(int)cell.comment_______].Value = "";
+                if (row.Cells[(int)cell.quality_______].Value == null) row.Cells[(int)cell.quality_______].Value = "";
+                if (row.Cells[(int)cell.map___________].Value == null) row.Cells[(int)cell.map___________].Value = "";
+                if (row.Cells[(int)cell.gameMode______].Value == null) row.Cells[(int)cell.gameMode______].Value = "";
+                if (row.Cells[(int)cell.playerCount___].Value == null) row.Cells[(int)cell.playerCount___].Value = "";
+                // if (row.Cells[(int)cell.map_variant_de].Value == null) row.Cells[(int)cell.map_variant_de].Value = "";
+                // if (row.Cells[(int)cell.game_variant_d].Value == null) row.Cells[(int)cell.game_variant_d].Value = "";
+
+                name__________ = row.Cells[(int)cell.gameTitle_____].Value.ToString();
+                map_variant___ = row.Cells[(int)cell.map_variant___].Value.ToString();
+                game_variant__ = row.Cells[(int)cell.game_variant__].Value.ToString();
+                enabled_______ = row.Cells[(int)cell.enabled_______].Value.ToString();
+                comment_______ = row.Cells[(int)cell.comment_______].Value.ToString();
+                quality_______ = row.Cells[(int)cell.quality_______].Value.ToString();
+                map___________ = row.Cells[(int)cell.map___________].Value.ToString();
+                gameMode______ = row.Cells[(int)cell.gameMode______].Value.ToString();
+                playerCount___ = row.Cells[(int)cell.playerCount___].Value.ToString();
+                // map_variant_de = row.Cells[(int)cell.map_variant_de].Value.ToString();
+                // game_variant_d = row.Cells[(int)cell.game_variant_d].Value.ToString();
+
+                // i need to learn a compact way to do this
+                if (game_variant__ == "")
+                    continue;
+
+                string outputline =
+                    $"{name__________};" +
+                    $"{map_variant___};" +
+                    $"{game_variant__};" +
+                    $"{enabled_______};" +
+                    $"{comment_______};" +
+                    $"{quality_______};" +
+                    $"{map___________};" +
+                    $"{gameMode______};" +
+                    $"{playerCount___};" +
+                    "";
+                // $"{map_variant_de};" +
+                // $"{game_variant_d}";
+
+                output.Add(outputline);
+                // $"{description}";
+            }
+
+            // WriteCsv(output, logFile);
+            clog("TEMPDEBUG");
+            clog($"WriteCsv({output.Count}, {logFile})");
+            foreach (var a in output)
+                clog(a);
+            clog("TEMPDEBUG end WriteCsv");
         }
     }
 }
